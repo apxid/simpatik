@@ -460,31 +460,6 @@
             background: var(--success);
         }
 
-        /* TOMBOL PEMBERSIHAN DATA REMEDIAL */
-        .btn-remedial-clear {
-            background: var(--belum-tuntas);
-            color: white;
-            border: none;
-        }
-
-        .btn-remedial-clear:hover {
-            opacity: 0.92;
-            transform: translateY(-1px);
-        }
-
-        .remedial-note {
-            margin: 0 0 18px;
-            padding: 12px 14px;
-            border-radius: 12px;
-            background: #fff7ed;
-            border: 1px solid #fed7aa;
-            color: #9a3412;
-            font-size: 12px;
-            line-height: 1.5;
-            text-align: center;
-            display: none;
-        }
-
         .app-footer {
             display: flex;
             justify-content: space-between;
@@ -827,11 +802,6 @@
                 Anda dapat mengekliknya jika ingin langsung mengulang materi tersebut.
 
             </p>
-
-            <div id="remedial-clear-area" class="remedial-note">
-                <strong><i class="fa-solid fa-broom"></i> MODE REMEDIAL</strong><br>
-                Klik tombol TP berwarna orange di atas. Sebelum remedial dimulai, sistem akan otomatis membersihkan data sementara pengerjaan lama dari browser.
-            </div>
 
             <button class="btn btn-block"
                     id="btnPindahKuesioner"
@@ -1251,37 +1221,6 @@ window.addEventListener(
         aturTombolIndikatorTP();
 
         await muatDataSoal();
-
-        /*
-         * Jika siswa sebelumnya menekan tombol remedial, halaman
-         * sengaja dimuat ulang setelah data sesi sementara dibersihkan.
-         * Flag ini membuat remedial dilanjutkan otomatis.
-         */
-        const remedialPending =
-            sessionStorage.getItem("simpatik_remedial_pending");
-
-        if (remedialPending) {
-            sessionStorage.removeItem("simpatik_remedial_pending");
-
-            try {
-                const kodeTP = remedialPending;
-                const soalRemidi = backupMasterSoal.filter(s => {
-                    const noSoal = parseInt(s.no);
-                    return kodeTP === "TP1"
-                        ? noSoal >= 1 && noSoal <= 10
-                        : kodeTP === "TP2"
-                            ? noSoal >= 11 && noSoal <= 20
-                            : false;
-                });
-
-                if (soalRemidi.length > 0) {
-                    masterSoal = soalRemidi;
-                    mulaiUjian();
-                }
-            } catch (e) {
-                console.error("Gagal melanjutkan remedial:", e);
-            }
-        }
 
     }
 );
@@ -1717,142 +1656,25 @@ function mulaiRemidiPerTP(kodeTP) {
         title: "Konfirmasi Ulang",
 
         text:
-        `Sebelum remedial dimulai, sistem akan membersihkan data sementara pengerjaan lama dari browser. Data nilai yang sudah tersimpan di server TIDAK akan dihapus. Lanjutkan remedial ${kodeTP}?`,
+        `Apakah Anda ingin memulai pengerjaan remedial instan untuk kelompok materi ${kodeTP}?`,
 
         confirmText:
-            "Bersihkan & Mulai",
+            "Ya, Mulai",
 
         cancelText:
             "Batal",
 
         onConfirm: () => {
-            sessionStorage.setItem(
-                "simpatik_remedial_pending",
-                kodeTP
-            );
 
-            jalankanPembersihanRemedial(kodeTP);
+            masterSoal =
+                soalRemidi;
+
+            mulaiUjian();
+
         }
 
     });
 
-}
-
-
-/* =========================================================
-   BERSIHKAN DATA REMEDIAL
-
-   Catatan:
-   JavaScript tidak diizinkan Chrome menghapus seluruh HTTP cache
-   browser. Fungsi ini membersihkan data aplikasi yang berada di
-   storage/cache yang dapat dikendalikan oleh halaman, tanpa menghapus
-   sesi login siswa atau data nilai di server.
-========================================================= */
-async function bersihkanDataRemedial(kodeTP = null) {
-
-    try {
-        if (!kodeTP) {
-            const statusTP = dataSiswa.status_tp || {};
-            kodeTP = statusTP.tp1 !== "TUNTAS"
-                ? "TP1"
-                : statusTP.tp2 !== "TUNTAS"
-                    ? "TP2"
-                    : null;
-        }
-
-        if (!kodeTP) {
-            showModal({
-                type: "success",
-                title: "Semua TP Tuntas",
-                text: "Tidak ada remedial yang perlu dijalankan."
-            });
-            return;
-        }
-
-        showModal({
-            type: "warning",
-            title: "Bersihkan Data Remedial?",
-            text: `Data sementara pengerjaan lama akan dibersihkan. Data nilai yang sudah tersimpan di server tetap aman. Setelah itu remedial ${kodeTP} akan dimulai.`,
-            confirmText: "Ya, Bersihkan",
-            cancelText: "Batal",
-            onConfirm: () => {
-                sessionStorage.setItem("simpatik_remedial_pending", kodeTP);
-                jalankanPembersihanRemedial(kodeTP);
-            }
-        });
-
-    } catch (error) {
-        console.error("Persiapan remedial gagal:", error);
-    }
-}
-
-async function jalankanPembersihanRemedial(kodeTP) {
-
-    try {
-        // Bersihkan data sementara aplikasi pada sessionStorage.
-        const sessionKeys = [];
-        for (let i = 0; i < sessionStorage.length; i++) {
-            sessionKeys.push(sessionStorage.key(i));
-        }
-
-        sessionKeys.forEach(key => {
-            if (key && (
-                key.toLowerCase().includes("jawab") ||
-                key.toLowerCase().includes("soal") ||
-                key.toLowerCase().includes("ujian") ||
-                key.toLowerCase().includes("remed") ||
-                key.toLowerCase().includes("pengerjaan") ||
-                key.toLowerCase().includes("simpatik")
-            )) {
-                // Jangan hapus flag remedial yang baru dibuat.
-                if (key !== "simpatik_remedial_pending") {
-                    sessionStorage.removeItem(key);
-                }
-            }
-        });
-
-        // Hapus cache yang dikelola Cache Storage/API (jika ada).
-        if ("caches" in window) {
-            const cacheNames = await caches.keys();
-            await Promise.all(
-                cacheNames.map(name => caches.delete(name))
-            );
-        }
-
-        // Reset seluruh state ujian yang sedang berada di memori.
-        jawabanSiswa = {};
-        indeksSekarang = 0;
-        masterSoal = [];
-        backupMasterSoal = [];
-
-        /*
-         * Jangan menghapus localStorage "sesi_siswa" karena siswa masih
-         * harus tetap login. Nilai dan histori di Google Sheets juga aman.
-         */
-
-        if (kodeTP) {
-            sessionStorage.setItem(
-                "simpatik_remedial_pending",
-                kodeTP
-            );
-        }
-
-        // Muat ulang halaman dengan parameter unik untuk menghindari
-        // penggunaan dokumen HTML lama dari cache browser.
-        const url = new URL(window.location.href);
-        url.searchParams.set("remedial_reset", Date.now().toString());
-
-        window.location.replace(url.toString());
-
-    } catch (error) {
-        console.error("Pembersihan data remedial gagal:", error);
-
-        showModal({
-            type: "error",
-            title: "Gagal Menyiapkan Remedial",
-            text: "Data sementara tidak berhasil dibersihkan. Silakan muat ulang halaman lalu coba kembali."
-        });
-    }
 }
 
 
@@ -2385,12 +2207,6 @@ async function hitungDanSelesaiUjian() {
         );
 
 
-    const btnBersihkanRemedial =
-        document.getElementById("btnBersihkanRemedial");
-
-    const remedialClearArea =
-        document.getElementById("remedial-clear-area");
-
     if (
         tp1Tuntas &&
         tp2Tuntas
@@ -2399,27 +2215,11 @@ async function hitungDanSelesaiUjian() {
         btnPindahKuesioner.style.display =
             "flex";
 
-        if (btnBersihkanRemedial) {
-            btnBersihkanRemedial.style.display = "none";
-        }
-
-        if (remedialClearArea) {
-            remedialClearArea.style.display = "none";
-        }
-
     }
     else {
 
         btnPindahKuesioner.style.display =
             "none";
-
-        if (btnBersihkanRemedial) {
-            btnBersihkanRemedial.style.display = "none";
-        }
-
-        if (remedialClearArea) {
-            remedialClearArea.style.display = "block";
-        }
 
     }
 
@@ -2467,15 +2267,6 @@ async function hitungDanSelesaiUjian() {
 
                         username:
                             dataSiswa.username,
-
-                        id_login:
-                            dataSiswa.id_login || "",
-
-                        session_id:
-                            dataSiswa.session_id ||
-                            dataSiswa.sessionId ||
-                            dataSiswa.id_session ||
-                            "",
 
                         skor:
                             skorAkhir,
