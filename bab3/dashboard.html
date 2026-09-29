@@ -1706,7 +1706,39 @@ async function muatDataSoal() {
    MULAI UJIAN
 ========================================================= */
 
+function mintaLayarPenuh() {
+
+    // Browser hanya mengizinkan fullscreen setelah tindakan pengguna.
+    // Pemanggilan dilakukan dari klik tombol Mulai Ujian.
+    if (document.fullscreenElement) {
+        return;
+    }
+
+    const elemenHalaman = document.documentElement;
+    const requestFullscreen =
+        elemenHalaman.requestFullscreen ||
+        elemenHalaman.webkitRequestFullscreen;
+
+    if (requestFullscreen) {
+        try {
+            const hasil = requestFullscreen.call(elemenHalaman);
+            if (hasil && typeof hasil.catch === "function") {
+                hasil.catch(error => {
+                    console.warn("Fullscreen tidak dapat diaktifkan:", error);
+                });
+            }
+        } catch (error) {
+            console.warn("Fullscreen tidak didukung atau ditolak browser:", error);
+        }
+    } else {
+        console.warn("Fullscreen API tidak didukung browser ini.");
+    }
+
+}
+
 function mulaiUjian() {
+
+    mintaLayarPenuh();
 
     indeksSekarang = 0;
 
