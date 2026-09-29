@@ -651,6 +651,12 @@
         .anti-tab-icon { margin-bottom: 12px; color: #dc2626; font-size: 48px; }
         .anti-tab-title { margin-bottom: 10px; color: #991b1b; font-size: 21px; font-weight: 800; }
         .anti-tab-message { margin-bottom: 18px; color: #475569; font-size: 14px; line-height: 1.55; }
+        .anti-tab-countdown {
+            display: inline-block; margin: 0 auto 16px; padding: 8px 12px;
+            border: 1px solid #bfdbfe; border-radius: 999px; background: #eff6ff;
+            color: #1e40af; font-size: 12px; font-weight: 700;
+        }
+        .anti-tab-countdown[hidden] { display: none; }
         .anti-tab-pin {
             width: 100%; margin-bottom: 10px; padding: 13px 14px; border: 1px solid #cbd5e1;
             border-radius: 10px; background: #f8fafc; font-size: 18px; letter-spacing: .22em; text-align: center;
@@ -772,6 +778,10 @@
             <p class="section-desc"
                id="info-progres">
                 Soal n dari n
+            </p>
+
+            <p id="antiTabAutoCountdown" class="anti-tab-countdown" hidden>
+                Peringatan otomatis akan muncul dalam 05:00.
             </p>
 
             <div class="cbt-layout">
@@ -1128,6 +1138,17 @@ const antiTabOverlay = document.getElementById("antiTabOverlay");
 const antiTabPinInput = document.getElementById("antiTabPin");
 const antiTabError = document.getElementById("antiTabError");
 const antiTabAudio = document.getElementById("antiTabWarningAudio");
+const antiTabMessage = document.querySelector(".anti-tab-message");
+const antiTabCountdown = document.getElementById("antiTabAutoCountdown");
+const ANTI_TAB_AUTO_SHOWN_KEY = ANTI_TAB_LOCK_KEY + "_auto_shown";
+const ANTI_TAB_AUTO_DEADLINE_KEY = ANTI_TAB_LOCK_KEY + "_auto_deadline";
+const ANTI_TAB_AUTO_DELAY_MS = 5 * 60 * 1000;
+let antiTabCountdownTimer = null;
+let antiTabCountdownDeadline = 0;
+
+function halamanSoalAktif() {
+    return document.getElementById("sec-soal")?.classList.contains("active") === true;
+}
 
 function simpanStatusKunciTab(terkunci) {
     try {
@@ -1141,12 +1162,20 @@ function putarAudioPeringatan() {
     const playPromise = antiTabAudio.play();
     if (playPromise && typeof playPromise.catch === "function") playPromise.catch(() => {});
 }
-function kunciKarenaPindahTab() {
+function kunciKarenaPindahTab(alasan = "pindah-tab", pulihkanKunci = false) {
+    // Popup pelanggaran hanya dipicu saat halaman Lembar Soal sedang aktif.
+    // PulihkanKunci menjaga lock yang sudah tersimpan tetap berlaku sesudah reload.
+    if (!pulihkanKunci && !halamanSoalAktif()) return;
     antiTabLocked = true;
     simpanStatusKunciTab(true);
     document.body.classList.add("anti-tab-locked");
     antiTabOverlay.classList.add("active");
     antiTabOverlay.setAttribute("aria-hidden", "false");
+    antiTabMessage.textContent = alasan === "otomatis"
+        ? "Waktu 5 menit telah habis. Peringatan otomatis ditampilkan dan halaman ujian dikunci. Masukkan PIN admin untuk melanjutkan."
+        : alasan === "pulihkan"
+            ? "Halaman ujian masih terkunci dari pelanggaran sebelumnya. Masukkan PIN admin untuk melanjutkan."
+            : "Perpindahan atau pembukaan tab lain terdeteksi. Halaman ujian dikunci. Masukkan PIN admin untuk kembali mengerjakan soal.";
     antiTabError.textContent = "";
     putarAudioPeringatan();
     window.setTimeout(() => { if (antiTabLocked) antiTabPinInput.focus(); }, 100);
@@ -1170,12 +1199,70 @@ function bukaKunciDenganPin(pin) {
     antiTabAudio.currentTime = 0;
     return true;
 }
+
+function hentikanCountdownPeringatan(hapusDeadline = false) {
+    if (antiTabCountdownTimer !== null) {
+        window.clearInterval(antiTabCountdownTimer);
+        antiTabCountdownTimer = null;
+    }
+    if (hapusDeadline) {
+        antiTabCountdownDeadline = 0;
+        try { localStorage.removeItem(ANTI_TAB_AUTO_DEADLINE_KEY); } catch (error) {}
+    }
+    if (antiTabCountdown) antiTabCountdown.hidden = true;
+}
+
+function mulaiCountdownPeringatan() {
+    hentikanCountdownPeringatan(false);
+    if (!halamanSoalAktif()) return;
+
+    try {
+        if (localStorage.getItem(ANTI_TAB_AUTO_SHOWN_KEY) === "1") {
+            antiTabCountdown.hidden = false;
+            antiTabCountdown.textContent = "Peringatan otomatis 5 menit sudah ditampilkan.";
+            return;
+        }
+        const deadlineTersimpan = Number(localStorage.getItem(ANTI_TAB_AUTO_DEADLINE_KEY));
+        antiTabCountdownDeadline = deadlineTersimpan > Date.now()
+            ? deadlineTersimpan
+            : Date.now() + ANTI_TAB_AUTO_DELAY_MS;
+        localStorage.setItem(ANTI_TAB_AUTO_DEADLINE_KEY, String(antiTabCountdownDeadline));
+    } catch (error) {
+        antiTabCountdownDeadline = Date.now() + ANTI_TAB_AUTO_DELAY_MS;
+    }
+
+    antiTabCountdown.hidden = false;
+    const perbaruiCountdown = () => {
+        if (!halamanSoalAktif()) {
+            hentikanCountdownPeringatan(true);
+            return;
+        }
+        const sisaMs = Math.max(0, antiTabCountdownDeadline - Date.now());
+        const sisaDetik = Math.ceil(sisaMs / 1000);
+        const menit = String(Math.floor(sisaDetik / 60)).padStart(2, "0");
+        const detik = String(sisaDetik % 60).padStart(2, "0");
+        antiTabCountdown.textContent = sisaMs > 0
+            ? `Peringatan otomatis akan muncul dalam ${menit}:${detik}.`
+            : "Peringatan otomatis sedang ditampilkan.";
+
+        if (sisaMs <= 0) {
+            hentikanCountdownPeringatan(true);
+            try { localStorage.setItem(ANTI_TAB_AUTO_SHOWN_KEY, "1"); } catch (error) {}
+            antiTabCountdown.hidden = false;
+            antiTabCountdown.textContent = "Peringatan otomatis 5 menit sudah ditampilkan.";
+            kunciKarenaPindahTab("otomatis");
+        }
+    };
+    perbaruiCountdown();
+    antiTabCountdownTimer = window.setInterval(perbaruiCountdown, 1000);
+}
+
 try {
-    if (localStorage.getItem(ANTI_TAB_LOCK_KEY) === "1") kunciKarenaPindahTab();
+    if (localStorage.getItem(ANTI_TAB_LOCK_KEY) === "1") kunciKarenaPindahTab("pulihkan", true);
 } catch (error) { console.warn("Status kunci tab tidak dapat dibaca:", error); }
 
 document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "hidden") kunciKarenaPindahTab();
+    if (document.visibilityState === "hidden" && halamanSoalAktif()) kunciKarenaPindahTab();
     else if (antiTabLocked) {
         putarAudioPeringatan();
         window.setTimeout(() => antiTabPinInput.focus(), 50);
@@ -1706,7 +1793,45 @@ async function muatDataSoal() {
    MULAI UJIAN
 ========================================================= */
 
+function mintaLayarPenuh() {
+
+    // Browser hanya mengizinkan fullscreen setelah tindakan pengguna.
+    // Pemanggilan dilakukan dari klik tombol Mulai Ujian.
+    if (document.fullscreenElement) {
+        return;
+    }
+
+    const elemenHalaman = document.documentElement;
+    const requestFullscreen =
+        elemenHalaman.requestFullscreen ||
+        elemenHalaman.webkitRequestFullscreen;
+
+    if (requestFullscreen) {
+        try {
+            const hasil = requestFullscreen.call(elemenHalaman);
+            if (hasil && typeof hasil.catch === "function") {
+                hasil.catch(error => {
+                    console.warn("Fullscreen tidak dapat diaktifkan:", error);
+                });
+            }
+        } catch (error) {
+            console.warn("Fullscreen tidak didukung atau ditolak browser:", error);
+        }
+    } else {
+        console.warn("Fullscreen API tidak didukung browser ini.");
+    }
+
+}
+
 function mulaiUjian() {
+
+    mintaLayarPenuh();
+
+    // Setiap sesi soal baru memperoleh satu peringatan otomatis setelah 5 menit.
+    try {
+        localStorage.removeItem(ANTI_TAB_AUTO_SHOWN_KEY);
+        localStorage.removeItem(ANTI_TAB_AUTO_DEADLINE_KEY);
+    } catch (error) {}
 
     indeksSekarang = 0;
 
@@ -2725,6 +2850,12 @@ function pindahKe(idSection) {
         .classList.add(
             "active"
         );
+
+    if (idSection === "sec-soal") {
+        mulaiCountdownPeringatan();
+    } else {
+        hentikanCountdownPeringatan(true);
+    }
 
 
     if (
