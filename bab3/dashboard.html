@@ -1,3414 +1,1787 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Ujian - SIMPATIK v1.1</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-    <link rel="stylesheet" href="zoom-fitur.css">
-
-    <style>
-        :root {
-            --primary: #1e40af;
-            --primary-light: #3b82f6;
-            --success: #22c55e;
-            --text-dark: #1e293b;
-            --text-light: #64748b;
-            --bg-input: #f8fafc;
-            --border-color: #e2e8f0;
-            --tuntas: #16a34a;
-            --belum-tuntas: #ea580c;
-            --danger: #ef4444;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-
-        body {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #1e40af 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 12px;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 850px;
-            transition: all 0.3s ease;
-        }
-
-        .max-normal {
-            max-width: 600px;
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.98);
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-        }
-
-        @media(min-width: 768px) {
-            .card {
-                padding: 35px;
-                border-radius: 24px;
-            }
-        }
-
-        .wizard-section {
-            display: none;
-        }
-
-        .wizard-section.active {
-            display: block;
-        }
-
-        h2 {
-            color: var(--text-dark);
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            text-align: center;
-        }
-
-        @media(min-width: 768px) {
-            h2 {
-                font-size: 24px;
-            }
-        }
-
-        .section-desc {
-            color: var(--text-light);
-            font-size: 13px;
-            text-align: center;
-            margin-bottom: 25px;
-            line-height: 1.4;
-        }
-
-        .info-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 25px;
-            background: var(--bg-input);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .info-table td {
-            padding: 12px 14px;
-            font-size: 14px;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--text-dark);
-        }
-
-        .info-table td:first-child {
-            font-weight: 600;
-            color: var(--text-light);
-            width: 40%;
-        }
-
-        @media(min-width: 768px) {
-            .info-table td {
-                padding: 14px 16px;
-                font-size: 15px;
-            }
-
-            .info-table td:first-child {
-                width: 35%;
-            }
-        }
-
-        .tp-container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 25px;
-            justify-content: center;
-        }
-
-        @media(min-width: 480px) {
-            .tp-container {
-                flex-direction: row;
-                flex-wrap: wrap;
-            }
-        }
-
-        .btn-tp {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 12px;
-            color: white;
-            font-weight: 600;
-            font-size: 13px;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            transition: transform 0.2s;
-        }
-
-        @media(min-width: 480px) {
-            .btn-tp {
-                flex: 1;
-                min-width: 140px;
-            }
-        }
-
-        .btn-tp.remedi-clickable {
-            cursor: pointer;
-        }
-
-        .btn-tp.remedi-clickable:hover {
-            transform: scale(1.03);
-            opacity: 0.9;
-        }
-
-        .cbt-layout {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-
-        @media(min-width: 768px) {
-            .cbt-layout {
-                display: grid;
-                grid-template-columns: 2.8fr 1.2fr;
-            }
-        }
-
-        .box-soal {
-            background: var(--bg-input);
-            padding: 16px;
-            border-radius: 14px;
-            border: 1px solid var(--border-color);
-            margin-bottom: 20px;
-            font-size: 15px;
-            color: var(--text-dark);
-            line-height: 1.6;
-            word-break: break-word;
-        }
-
-        @media(min-width: 768px) {
-            .box-soal {
-                padding: 20px;
-                font-size: 16px;
-            }
-        }
-
-        .img-soal {
-            width: 100%;
-            max-height: 220px;
-            object-fit: contain;
-            border-radius: 8px;
-            margin-top: 12px;
-            border: 1px solid var(--border-color);
-            display: none;
-        }
-
-        .opsi-jawaban {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 25px;
-        }
-
-        .opsi {
-            padding: 12px 14px;
-            border: 1.5px solid var(--border-color);
-            border-radius: 12px;
-            cursor: pointer;
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            font-size: 14px;
-            background: white;
-            transition: all 0.2s ease;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .opsi:hover {
-            border-color: var(--primary-light);
-            background: #f0f7ff;
-        }
-
-        .opsi.selected {
-            border-color: var(--primary-light);
-            background: #e0f2fe;
-            font-weight: 600;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
-        }
-
-        .opsi input {
-            display: none;
-        }
-
-        .opsi span {
-            line-height: 1.4;
-        }
-
-        @media(min-width: 768px) {
-            .opsi {
-                padding: 14px 16px;
-                font-size: 15px;
-                gap: 12px;
-            }
-
-            .opsi:hover {
-                transform: translateX(4px);
-            }
-        }
-
-        .nav-soal {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-            width: 100%;
-        }
-
-        .nav-soal .btn {
-            flex: 1;
-            padding: 12px 10px;
-            font-size: 14px;
-            justify-content: center;
-            white-space: nowrap;
-        }
-
-        .cbt-nav-panel {
-            border-top: 1px solid var(--border-color);
-            padding-top: 20px;
-        }
-
-        @media(min-width: 768px) {
-            .cbt-nav-panel {
-                border-top: none;
-                border-left: 1px solid var(--border-color);
-                padding-top: 0;
-                padding-left: 20px;
-            }
-        }
-
-        .nav-panel-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .grid-nomor {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 6px;
-        }
-
-        .btn-nomor {
-            width: 100%;
-            aspect-ratio: 1;
-            border: 1.5px solid var(--border-color);
-            background: white;
-            color: var(--text-dark);
-            font-weight: 600;
-            font-size: 13px;
-            border-radius: 8px;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .btn-nomor.answered {
-            background: var(--primary-light);
-            color: white;
-            border-color: var(--primary-light);
-        }
-
-        .btn-nomor.active {
-            border: 2.5px solid #0f172a;
-            box-shadow: 0 0 0 2px var(--primary-light);
-            font-weight: 800;
-            transform: scale(1.03);
-        }
-
-        .nilai-circle {
-            width: 110px;
-            height: 110px;
-            background: #f0fdf4;
-            border: 4px solid var(--success);
-            color: var(--success);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 38px;
-            font-weight: 800;
-            margin: 0 auto 20px;
-        }
-
-        .star-rating {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
-            font-size: 28px;
-            flex-direction: row-reverse;
-        }
-
-        .star-rating i {
-            color: #cbd5e1;
-            cursor: pointer;
-            transition: color 0.2s, transform 0.1s;
-        }
-
-        .star-rating i:hover,
-        .star-rating i:hover ~ i,
-        .star-rating i.active,
-        .star-rating i.active ~ i {
-            color: #fbbf24;
-        }
-
-        .radio-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-
-        @media(min-width: 480px) {
-            .radio-group {
-                flex-direction: row;
-            }
-        }
-
-        .radio-btn {
-            flex: 1;
-            text-align: center;
-            padding: 12px;
-            border: 1.5px solid var(--border-color);
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-dark);
-            background: white;
-        }
-
-        .radio-btn input {
-            display: none;
-        }
-
-        .radio-btn.selected {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1.5px solid var(--border-color);
-            border-radius: 12px;
-            resize: none;
-            min-height: 80px;
-            font-size: 14px;
-            outline: none;
-            margin-bottom: 25px;
-            background: var(--bg-input);
-        }
-
-        .btn {
-            padding: 14px;
-            border: none;
-            border-radius: 12px;
-            background: var(--primary);
-            color: white;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.2s;
-        }
-
-        .btn:disabled {
-            opacity: 0.65;
-            cursor: not-allowed;
-        }
-
-        .btn-block {
-            width: 100%;
-        }
-
-        .btn-success {
-            background: var(--success);
-        }
-
-        /* TOMBOL PEMBERSIHAN DATA REMEDIAL */
-        .btn-remedial-clear {
-            background: var(--belum-tuntas);
-            color: white;
-            border: none;
-        }
-
-        .btn-remedial-clear:hover {
-            opacity: 0.92;
-            transform: translateY(-1px);
-        }
-
-        .remedial-note {
-            margin: 0 0 18px;
-            padding: 12px 14px;
-            border-radius: 12px;
-            background: #fff7ed;
-            border: 1px solid #fed7aa;
-            color: #9a3412;
-            font-size: 12px;
-            line-height: 1.5;
-            text-align: center;
-            display: none;
-        }
-
-        .app-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 30px;
-            padding-top: 15px;
-            border-top: 1px solid var(--border-color);
-            font-size: 12px;
-            color: var(--text-light);
-        }
-
-        .btn-logout-footer {
-            background: transparent;
-            border: 1px solid var(--danger);
-            color: var(--danger);
-            padding: 6px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 11px;
-        }
-
-        .btn-logout-footer:disabled {
-            opacity: 0.6;
-            cursor: wait;
-        }
-
-        .spinner {
-            display: none;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 0.8s linear infinite;
-        }
-
-        .thankyou-wrapper {
-            text-align: center;
-            padding: 15px 0;
-        }
-
-        .thankyou-icon {
-            font-size: 55px;
-            color: var(--success);
-            margin-bottom: 20px;
-        }
-
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(4px);
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-            padding: 15px;
-        }
-
-        .modal-overlay.show {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .modal-box {
-            background: white;
-            width: 100%;
-            max-width: 400px;
-            border-radius: 20px;
-            padding: 25px;
-            text-align: center;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
-            transform: scale(0.8);
-            transition: transform 0.3s;
-        }
-
-        .modal-overlay.show .modal-box {
-            transform: scale(1);
-        }
-
-        .modal-icon {
-            font-size: 50px;
-            margin-bottom: 15px;
-        }
-
-        .modal-icon.error {
-            color: var(--danger);
-        }
-
-        .modal-icon.warning {
-            color: var(--belum-tuntas);
-        }
-
-        .modal-icon.success {
-            color: var(--success);
-        }
-
-        .modal-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin-bottom: 8px;
-        }
-
-        .modal-text {
-            font-size: 14px;
-            color: var(--text-light);
-            line-height: 1.5;
-            margin-bottom: 20px;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
-
-        .modal-btn {
-            padding: 11px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .modal-btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .modal-btn-secondary {
-            background: #e2e8f0;
-            color: var(--text-dark);
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-    
-        /* PERLINDUNGAN PINDAH TAB */
-        body.anti-tab-locked { overflow: hidden !important; }
-        .anti-tab-overlay {
-            position: fixed; inset: 0; z-index: 20000; display: none;
-            align-items: center; justify-content: center; padding: 18px;
-            background: rgba(2, 6, 23, .92); backdrop-filter: blur(7px);
-        }
-        .anti-tab-overlay.active { display: flex; }
-        .anti-tab-dialog {
-            width: min(100%, 430px); padding: 28px 24px; border-radius: 18px;
-            background: #fff; text-align: center; box-shadow: 0 24px 70px rgba(0,0,0,.45);
-            animation: antiTabPop .2s ease-out;
-        }
-        @keyframes antiTabPop {
-            from { opacity: 0; transform: scale(.94) translateY(8px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-        .anti-tab-icon { margin-bottom: 12px; color: #dc2626; font-size: 48px; }
-        .anti-tab-title { margin-bottom: 10px; color: #991b1b; font-size: 21px; font-weight: 800; }
-        .anti-tab-message { margin-bottom: 18px; color: #475569; font-size: 14px; line-height: 1.55; }
-        .anti-tab-popup-timer {
-            display: block; margin: 0 auto 18px; padding: 10px 12px;
-            border: 1px solid #bfdbfe; border-radius: 10px; background: #eff6ff;
-            color: #1e40af; font-size: 13px; font-weight: 700; line-height: 1.5;
-        }
-        .anti-tab-popup-timer strong { display: block; margin-top: 3px; font-size: 23px; letter-spacing: .08em; }
-        [hidden] { display: none !important; }
-        .anti-tab-pin {
-            width: 100%; margin-bottom: 10px; padding: 13px 14px; border: 1px solid #cbd5e1;
-            border-radius: 10px; background: #f8fafc; font-size: 18px; letter-spacing: .22em; text-align: center;
-        }
-        .anti-tab-pin:focus { outline: 3px solid rgba(59,130,246,.25); border-color: #3b82f6; }
-        .anti-tab-error { min-height: 20px; margin: 0 0 10px; color: #dc2626; font-size: 13px; font-weight: 600; }
-        .anti-tab-unlock {
-            width: 100%; padding: 13px 16px; border: 0; border-radius: 10px;
-            background: #1e40af; color: white; font-size: 15px; font-weight: 700; cursor: pointer;
-        }
-        .anti-tab-unlock:hover { background: #1d4ed8; }
-
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#102b8f">
+  <title>CBT Integrated GForm</title>
+
+  <style>
+    :root{
+      --navy:#071737;
+      --navy-2:#102b8f;
+      --blue:#1f50f5;
+      --blue-2:#173bd1;
+      --lime:#c8ff00;
+      --lime-2:#b9f000;
+      --text:#0d1730;
+      --muted:#69738a;
+      --line:#dbe2f1;
+      --soft:#f3f6fc;
+      --white:#fff;
+      --danger:#d93025;
+      --success:#167c4b;
+      --shadow:0 24px 70px rgba(4,18,55,.25);
+      --radius:24px;
+    }
+
+    *{box-sizing:border-box}
+
+    html,body{
+      margin:0;
+      min-height:100%;
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 12% 15%,rgba(36,66,190,.38),transparent 23%),
+        radial-gradient(circle at 95% 12%,rgba(200,255,0,.12),transparent 18%),
+        linear-gradient(135deg,#102b68 0%,#07132f 55%,#06132d 100%);
+    }
+
+    body{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      overflow-x:hidden;
+    }
+
+    button,input,select,textarea{font:inherit}
+
+    .app{
+      width:min(1120px,100%);
+      min-height:600px;
+      background:var(--white);
+      border:1px solid rgba(255,255,255,.85);
+      border-radius:var(--radius);
+      overflow:hidden;
+      display:grid;
+      grid-template-columns:1.05fr 1fr;
+      box-shadow:var(--shadow);
+    }
+
+    /* LEFT / BRAND */
+    .brand{
+      position:relative;
+      min-height:600px;
+      padding:48px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      overflow:hidden;
+      color:white;
+      background:
+        radial-gradient(circle at 18% 15%,rgba(200,255,0,.15),transparent 18%),
+        linear-gradient(150deg,#10286e 0%,#173ba9 58%,#1c54f5 100%);
+    }
+
+    .brand:after{
+      content:"";
+      position:absolute;
+      top:-5%;
+      right:-7%;
+      width:20%;
+      height:110%;
+      background:var(--white);
+      clip-path:polygon(36% 0,100% 0,100% 100%,0 100%);
+      opacity:.98;
+    }
+
+    .brand-top,
+    .brand-bottom{
+      position:relative;
+      z-index:2;
+      max-width:430px;
+    }
+
+    .brand-top{
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+
+    .mini-mark{
+      width:48px;
+      height:48px;
+      border-radius:15px;
+      display:grid;
+      place-items:center;
+      font-weight:1000;
+      font-size:18px;
+      letter-spacing:-1px;
+      color:#0c2b98;
+      background:var(--lime);
+      box-shadow:0 10px 30px rgba(0,0,0,.16);
+    }
+    .mini-mark img{width:100%;height:100%;object-fit:contain;border-radius:inherit}
+
+    .brand-school{
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      opacity:.92;
+    }
+
+    .logo{
+      width:180px;
+      height:110px;
+      margin:50px auto 0;
+      position:relative;
+      display:grid;
+      place-items:center;
+      transform:skewX(-6deg);
+    }
+    .logo img{max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 12px 20px rgba(0,0,0,.18))}
+
+    .logo-ring{
+      position:absolute;
+      width:145px;
+      height:76px;
+      border:8px solid #11c6ff;
+      border-right-color:#0e55e8;
+      border-radius:50%;
+      transform:rotate(-10deg);
+    }
+
+    .logo-core{
+      position:relative;
+      padding:10px 17px 13px;
+      border-radius:48% 52% 48% 52%;
+      background:linear-gradient(145deg,#fff 0 18%,#ffd900 19% 48%,#ef9700 49% 54%,#fff 55% 60%,#1b45cf 61%);
+      color:#1543be;
+      font-weight:1000;
+      font-size:40px;
+      line-height:1;
+      letter-spacing:-4px;
+      text-shadow:0 2px 0 rgba(255,255,255,.7);
+      box-shadow:0 14px 28px rgba(0,0,0,.25);
+    }
+
+    .logo-tag{
+      position:absolute;
+      bottom:2px;
+      padding:4px 13px;
+      border-radius:999px;
+      background:#1238a9;
+      color:#fff;
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.12em;
+    }
+
+    .eyebrow{
+      color:var(--lime);
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      margin:0 0 10px;
+    }
+
+    .brand h1{
+      margin:0 0 12px;
+      font-size:clamp(28px,4vw,42px);
+      line-height:1.02;
+      letter-spacing:-1.7px;
+    }
+
+    .brand p{
+      margin:0;
+      max-width:430px;
+      color:rgba(255,255,255,.78);
+      line-height:1.6;
+      font-size:14px;
+    }
+
+    .version{
+      margin-top:24px;
+      font-size:11px;
+      color:rgba(255,255,255,.58);
+    }
+
+    /* RIGHT / CONTENT */
+    .content{
+      padding:58px clamp(28px,5vw,62px) 34px;
+      background:#fff;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      min-width:0;
+    }
+
+    .content-inner{
+      width:min(100%,430px);
+      margin:0 auto;
+    }
+
+    .title-kicker{
+      margin:0 0 8px;
+      color:#1d55ff;
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+    }
+
+    .content h2{
+      margin:0;
+      color:#0a1737;
+      font-size:clamp(25px,3vw,34px);
+      letter-spacing:-1.2px;
+      line-height:1.1;
+    }
+
+    .title-line{
+      width:46px;
+      height:5px;
+      border-radius:99px;
+      background:var(--lime);
+      margin:14px 0 28px;
+    }
+
+    .loading-options{color:var(--muted);font-size:12px;margin-top:6px}
+
+    .field{
+      margin-bottom:15px;
+    }
+
+    label{
+      display:block;
+      margin:0 0 7px;
+      font-size:11px;
+      font-weight:800;
+      color:#46516a;
+    }
+
+    .control-wrap{
+      position:relative;
+    }
+
+    input,select,textarea{
+      width:100%;
+      border:1px solid #d4ddef;
+      outline:none;
+      background:#f5f7fc;
+      color:#17213a;
+      border-radius:11px;
+      transition:.18s ease;
+    }
+
+    input,select{
+      height:39px;
+      padding:0 13px;
+      font-size:12px;
+    }
+
+    textarea{
+      min-height:100px;
+      padding:12px 13px;
+      resize:vertical;
+      font-size:13px;
+    }
+
+    input:focus,select:focus,textarea:focus{
+      border-color:#4c70ff;
+      background:#fff;
+      box-shadow:0 0 0 3px rgba(31,80,245,.10);
+    }
+
+    .password-row{
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+
+    .password-row input{flex:1}
+
+    .toggle-pass{
+      width:39px;
+      height:39px;
+      flex:0 0 39px;
+      border:1px solid #d4ddef;
+      border-radius:11px;
+      background:#f5f7fc;
+      cursor:pointer;
+      color:#546078;
+    }
+
+    .check{
+      display:flex;
+      align-items:center;
+      gap:7px;
+      margin:7px 0 15px;
+      color:#66718a;
+      font-size:10px;
+      cursor:pointer;
+    }
+
+    .check input{
+      width:13px;
+      height:13px;
+      accent-color:#1f50f5;
+    }
+
+    .btn{
+      width:100%;
+      border:0;
+      border-radius:11px;
+      height:39px;
+      font-size:12px;
+      font-weight:900;
+      cursor:pointer;
+      transition:transform .12s ease,filter .12s ease,box-shadow .12s ease;
+    }
+
+    .btn:hover{filter:brightness(.98)}
+    .btn:active{transform:translateY(1px)}
+    .btn:disabled{opacity:.55;cursor:not-allowed}
+
+    .btn-primary{
+      color:#07152d;
+      background:linear-gradient(180deg,#d2ff19,#baff00);
+      box-shadow:0 9px 24px rgba(188,244,0,.22);
+    }
+
+    .btn-blue{
+      margin-top:0;
+      color:#fff;
+      background:linear-gradient(180deg,#2856ff,#1c4ced);
+    }
+
+    .btn-secondary{
+      color:#243452;
+      background:#dce3f1;
+      border:1px solid #c9d3e7;
+    }
+
+    .stack{display:grid;gap:9px}
+
+    .footer{
+      margin-top:38px;
+      text-align:center;
+      font-size:8px;
+      color:#9aa4b8;
+    }
+
+    .footer strong{
+      color:#1f50f5;
+      font-weight:900;
+    }
+    .about-trigger{position:relative;isolation:isolate;overflow:hidden;display:inline-flex;align-items:center;gap:9px;max-width:min(100%,360px);padding:7px 15px 7px 8px;border:1px solid rgba(31,80,245,.15);border-radius:999px;background:linear-gradient(135deg,#fff 0%,#f4f7ff 55%,#eef3ff 100%);box-shadow:0 5px 16px rgba(16,43,143,.08);color:#173b9b;font:inherit;text-align:left;cursor:pointer;transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease,background .22s ease}
+    .about-trigger:focus-visible{outline:3px solid rgba(31,80,245,.28);outline-offset:3px}
+    .about-trigger::after{content:"";position:absolute;z-index:-1;inset:-40% auto -40% -45%;width:35%;transform:skewX(-24deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.9),transparent);opacity:0}
+    .about-trigger:hover,.about-trigger:focus-visible{transform:translateY(-2px);border-color:rgba(31,80,245,.38);background:linear-gradient(135deg,#fff 0%,#f3f7ff 55%,#e8efff 100%);box-shadow:0 10px 24px rgba(16,43,143,.17)}
+    .about-trigger:hover::after,.about-trigger:focus-visible::after{animation:aboutShine .8s ease forwards;opacity:1}
+    .about-trigger:hover .about-footer-logo,.about-trigger:focus-visible .about-footer-logo{transform:rotate(-7deg) scale(1.08);box-shadow:0 5px 12px rgba(16,43,143,.2)}
+    .about-footer-logo{width:31px;height:31px;flex:0 0 31px;object-fit:contain;border-radius:50%;background:#fff;box-shadow:0 2px 7px rgba(16,43,143,.12);transition:transform .22s ease,box-shadow .22s ease}
+    .about-footer-title{font-size:11px;font-weight:900;line-height:1.15;white-space:nowrap;letter-spacing:.01em}
+    @keyframes aboutShine{0%{left:-45%;opacity:0}20%{opacity:1}100%{left:125%;opacity:0}}
+    .app-footer{display:flex;justify-content:center;padding:14px 12px 8px;text-align:center}
+
+    /* SCREENS */
+    .screen{display:none}
+    .screen.active{display:block}
+
+    .google-form-overlay{
+      position:fixed;
+      inset:0;
+      z-index:1000;
+      display:none;
+      flex-direction:column;
+      width:100%;
+      height:100vh;
+      height:100dvh;
+      overflow:hidden;
+      background:#fff;
+    }
+    .google-form-overlay.active{display:flex}
+    .google-form-toolbar{
+      height:auto;
+      min-height:84px;
+      flex:0 0 auto;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:7px 16px;
+      padding-top:max(7px,env(safe-area-inset-top));
+      color:#fff;
+      background:#102b8f;
+      box-shadow:0 2px 12px rgba(4,18,55,.18);
+    }
+    .google-form-toolbar strong{font-size:13px}
+    .exam-hud-wrap{display:flex;align-items:center;gap:14px;min-width:0}
+    .exam-hud-brand{width:94px;flex:0 0 94px;display:flex;flex-direction:column;align-items:center;gap:3px}
+    .exam-hud-logo{display:block;width:48px;height:48px;max-width:48px;max-height:48px;object-fit:contain;border-radius:7px;background:#fff}
+    .exam-hud-student{max-width:100%;font-size:9px;line-height:1.15;color:rgba(255,255,255,.9);text-align:center;overflow-wrap:anywhere}
+    .exam-hud{display:flex;flex-direction:column;gap:5px;min-width:0}
+    .exam-timer{display:flex;align-items:center;gap:7px;color:#d2ff19;font-size:11px;font-weight:900;letter-spacing:.06em}
+    .exam-timer strong{font-variant-numeric:tabular-nums;font-size:15px;letter-spacing:.08em}
+    .google-form-toolbar-actions{display:flex;gap:8px;align-items:center}
+    .google-form-toolbar .btn{width:auto;min-width:132px;padding:0 14px}
+    #googleFormFrame{display:block;width:100%;height:auto;flex:1 1 auto;min-height:0;border:0;background:#fff;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+    .google-form-footer{min-height:55px;flex:0 0 55px;display:flex;align-items:center;justify-content:center;padding:4px 12px;padding-bottom:max(4px,env(safe-area-inset-bottom));background:linear-gradient(90deg,#f3f6fc,#fff 50%,#f3f6fc);border-top:1px solid #dbe2f1}
+    .about-dialog{width:min(430px,calc(100% - 32px));padding:0;border:0;border-radius:20px;background:#fff;box-shadow:0 24px 80px rgba(0,0,0,.35);color:#0d1730}
+    .about-dialog::backdrop{background:rgba(4,12,30,.68);backdrop-filter:blur(5px)}
+    .about-content{padding:28px;text-align:center}
+    .about-logo{width:88px;height:88px;object-fit:contain;margin:0 auto 12px}
+    .about-content h2{margin:0 0 9px;font-size:22px;color:#102b8f}
+    .about-content p{margin:5px 0;color:#526079;font-size:13px;line-height:1.5}
+    .about-content .about-version{color:#0d1730;font-weight:900}
+    .about-close{margin-top:19px}
+    .schedule-dialog{width:min(780px,calc(100% - 24px));max-height:calc(100vh - 28px);max-height:calc(100dvh - 28px);padding:0;border:0;border-radius:20px;background:#fff;box-shadow:0 24px 80px rgba(0,0,0,.35);color:#152443;overflow:hidden}
+    .schedule-dialog::backdrop{background:rgba(4,12,30,.72);backdrop-filter:blur(5px)}
+    .schedule-dialog-inner{max-height:inherit;display:flex;flex-direction:column}
+    .schedule-dialog-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:22px 24px 17px;background:linear-gradient(120deg,#102b8f,#214de0);color:#fff}
+    .schedule-dialog-head h2{margin:0;font-size:21px}
+    .schedule-dialog-head p{margin:5px 0 0;color:rgba(255,255,255,.78);font-size:12px}
+    .schedule-close{width:34px;height:34px;flex:0 0 34px;border:1px solid rgba(255,255,255,.3);border-radius:50%;background:rgba(255,255,255,.12);color:#fff;font-size:20px;cursor:pointer;transition:transform .18s ease,background .18s ease}
+    .schedule-close:hover{transform:rotate(90deg);background:rgba(255,255,255,.24)}
+    .schedule-dialog-body{padding:18px 22px 22px;overflow:auto}
+    .schedule-message{margin:0 0 12px;padding:11px 13px;border-radius:10px;background:#f2f5fb;color:#58657c;font-size:12px}
+    .schedule-message.error{background:#fff0ef;color:#a3312b}
+    .schedule-table-wrap{max-height:55vh;overflow:auto;border:1px solid #e1e7f2;border-radius:12px}
+    .schedule-table{width:100%;min-width:590px;border-collapse:separate;border-spacing:0;font-size:12px}
+    .schedule-table th{position:sticky;top:0;padding:12px 13px;background:#f1f4fb;color:#53617a;font-size:10px;letter-spacing:.06em;text-align:left;text-transform:uppercase;border-bottom:1px solid #e1e7f2}
+    .schedule-table td{padding:13px;border-bottom:1px solid #edf0f6;color:#263653}
+    .schedule-table tbody tr:nth-child(even){background:#fafbfe}
+    .schedule-table tbody tr:last-child td{border-bottom:0}
+    .schedule-table .schedule-time{font-variant-numeric:tabular-nums;font-weight:800;color:#173b9b;white-space:nowrap}
+    .violation-overlay{position:fixed;inset:0;z-index:3000;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(4,12,30,.88);backdrop-filter:blur(8px)}
+    .violation-overlay.active{display:flex}
+    .violation-card{width:min(480px,100%);padding:28px;border:1px solid #ffd1ce;border-radius:20px;background:#fff;box-shadow:0 30px 100px rgba(0,0,0,.4);text-align:center}
+    .violation-mark{width:56px;height:56px;margin:0 auto 16px;border-radius:50%;display:grid;place-items:center;color:#fff;background:#d93025;font-size:30px;font-weight:900}
+    .violation-card h2{margin:0 0 10px;color:#9f1d16;font-size:25px}
+    .violation-card p{margin:0 0 18px;color:#46516a;font-size:14px;line-height:1.6}
+    .violation-count{display:inline-block;margin:0 4px 10px;padding:7px 12px;border-radius:999px;background:#fff0ef;color:#9f1d16;font-size:12px;font-weight:900}
+    .violation-countdown{display:block;width:max-content;max-width:100%;margin:0 auto 18px;padding:9px 14px;border:1px solid #ffd1ce;border-radius:12px;background:#fff8f7;color:#9f1d16;font-size:14px;font-weight:900;font-variant-numeric:tabular-nums}
+    .violation-card label{text-align:left}
+    .violation-card input{height:46px;margin-bottom:10px;font-size:16px;letter-spacing:.2em;text-align:center}
+    .violation-error{min-height:20px;margin:0 0 10px!important;color:#b3261e!important;font-size:12px!important}
+    .violation-card .btn{height:46px}
+    .violation-card small{display:block;margin-top:13px;color:#7b8498;font-size:11px;line-height:1.5}
+    @media (max-width:700px){
+      .google-form-toolbar{
+        display:grid;
+        grid-template-columns:minmax(0,1fr);
+        grid-template-areas:"hud" "actions";
+        align-items:center;
+        gap:6px;
+        min-height:108px;
+        padding:6px 8px;
+        padding-top:max(6px,env(safe-area-inset-top));
+      }
+      .exam-hud-wrap{grid-area:hud;min-width:0;width:100%;gap:8px}
+      .google-form-toolbar-actions{grid-area:actions;width:100%;display:flex;gap:6px}
+      .google-form-toolbar-actions .btn{flex:1 1 0;min-width:0;width:0;height:34px;padding:0 6px;font-size:10px;white-space:nowrap}
+      .google-form-toolbar strong{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .exam-hud{gap:2px;min-width:0}
+      .exam-hud-wrap{gap:8px}
+      .exam-hud-brand{width:72px;flex:0 0 72px;gap:2px}
+      .exam-hud-logo{width:38px;height:38px;max-width:38px;max-height:38px}
+      .exam-hud-student,.exam-timer{font-size:8px}
+      .exam-hud-student{max-width:72px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+      .exam-timer strong{font-size:12px}
+      .google-form-footer{min-height:39px;flex-basis:39px;padding:2px 8px;padding-bottom:max(2px,env(safe-area-inset-bottom))}
+      .google-form-footer .about-trigger{max-width:230px}
+      .about-trigger{gap:7px;padding:6px 12px 6px 7px}
+      .about-footer-logo{width:27px;height:27px;flex-basis:27px}
+      .about-footer-title{font-size:10px}
+      .schedule-dialog-head{padding:18px 16px 14px}
+      .schedule-dialog-head h2{font-size:18px}
+      .schedule-dialog-body{padding:14px 12px 16px}
+      .violation-card{padding:23px 18px}
+      .violation-card h2{font-size:22px}
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      .about-trigger,.about-footer-logo{transition:none}
+      .about-trigger:hover::after,.about-trigger:focus-visible::after{animation:none}
+    }
+
+    .panel{
+      background:#f7f9fd;
+      border:1px solid #e1e6f1;
+      border-radius:16px;
+      padding:18px;
+      margin:18px 0;
+    }
+
+    .summary{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .summary-item{
+      background:#fff;
+      border:1px solid #e3e8f2;
+      border-radius:12px;
+      padding:11px;
+    }
+
+    .summary-item small{
+      display:block;
+      color:#8992a5;
+      font-size:9px;
+      margin-bottom:4px;
+    }
+
+    .summary-item strong{
+      display:block;
+      font-size:12px;
+      overflow-wrap:anywhere;
+    }
+
+    .notice{
+      padding:12px 14px;
+      border-radius:11px;
+      background:#edf3ff;
+      color:#29447f;
+      font-size:11px;
+      line-height:1.55;
+    }
+
+    .notice.success{
+      background:#eaf8f1;
+      color:#176a46;
+    }
+
+    .notice.error{
+      background:#fff0ef;
+      color:#9a2d26;
+    }
+
+    .form-actions{
+      display:grid;
+      gap:9px;
+      margin-top:16px;
+    }
+
+    .rating-group{
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:7px;
+    }
+
+    .rating-option{
+      position:relative;
+    }
+
+    .rating-option input{
+      position:absolute;
+      opacity:0;
+      pointer-events:none;
+    }
+
+    .rating-option label{
+      margin:0;
+      height:42px;
+      display:grid;
+      place-items:center;
+      border:1px solid #d8dfed;
+      background:#f7f9fd;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:900;
+      color:#56617a;
+    }
+
+    .rating-option input:checked + label{
+      color:#102b8f;
+      border-color:#7d9aff;
+      background:#eaf0ff;
+      box-shadow:0 0 0 2px rgba(31,80,245,.08);
+    }
+
+    .top-user{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:18px;
+    }
+
+    .user-chip{
+      min-width:0;
+    }
+
+    .user-chip strong{
+      display:block;
+      font-size:13px;
+    }
+
+    .user-chip span{
+      color:#7a8499;
+      font-size:10px;
+    }
+
+    .link-btn{
+      border:0;
+      background:transparent;
+      color:#1f50f5;
+      font-weight:900;
+      font-size:10px;
+      cursor:pointer;
+      padding:7px;
+    }
+
+    .loading{
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+    }
+
+    .spinner{
+      width:13px;
+      height:13px;
+      border:2px solid rgba(0,0,0,.15);
+      border-top-color:currentColor;
+      border-radius:50%;
+      animation:spin .7s linear infinite;
+    }
+
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* TABLET */
+    @media (max-width:900px){
+      body{padding:16px}
+      .app{
+        grid-template-columns:1fr;
+        max-width:680px;
+        min-height:0;
+      }
+
+      .brand{
+        min-height:280px;
+        padding:30px 32px;
+      }
+
+      .brand:after{display:none}
+
+      .logo{
+        position:absolute;
+        right:30px;
+        top:48px;
+        margin:0;
+        transform:scale(.78) skewX(-6deg);
+        transform-origin:right top;
+      }
+
+      .brand-bottom{max-width:58%}
+      .brand h1{font-size:30px}
+      .content{padding:34px 32px 28px}
+    }
+
+    /* PHONE */
+    @media (max-width:560px){
+      body{
+        padding:0;
+        align-items:stretch;
+        background:#fff;
+      }
+
+      .app{
+        width:100%;
+        min-height:100vh;
+        border:0;
+        border-radius:0;
+        box-shadow:none;
+      }
+
+      .brand{
+        min-height:225px;
+        padding:24px 22px;
+      }
+
+      .brand-top{gap:10px}
+      .mini-mark{width:38px;height:38px;border-radius:12px;font-size:14px}
+      .brand-school{font-size:9px}
+
+      .logo{
+        width:130px;
+        height:80px;
+        right:14px;
+        top:25px;
+        transform:scale(.62) skewX(-6deg);
+      }
+
+      .brand-bottom{
+        max-width:100%;
+        margin-top:auto;
+      }
+
+      .brand h1{
+        font-size:25px;
+        margin-bottom:7px;
+      }
+
+      .brand p{
+        font-size:11px;
+        max-width:62%;
+        line-height:1.45;
+      }
+
+      .version{margin-top:10px;font-size:9px}
+
+      .content{
+        padding:28px 20px 24px;
+        justify-content:flex-start;
+      }
+
+      .content h2{font-size:25px}
+      .title-line{margin-bottom:23px}
+
+      input,select{height:45px}
+      .toggle-pass{height:45px;flex-basis:45px}
+      .btn{height:45px}
+
+      .summary{grid-template-columns:1fr}
+      .panel{padding:14px}
+      .rating-group{gap:5px}
+      .rating-option label{height:40px}
+
+      .footer{margin-top:30px}
+    }
+
+    @media (max-width:360px){
+      .brand{min-height:205px}
+      .brand p{max-width:58%}
+      .logo{right:2px;transform:scale(.53) skewX(-6deg)}
+      .content{padding-left:16px;padding-right:16px}
+    }
+  </style>
 </head>
 
 <body>
+  <main class="app">
+    <!-- BRAND -->
+    <section class="brand">
+      <div class="brand-top">
+        <div class="mini-mark"><img src="https://yanuar-moga.github.io/cbt/assets/logo.png" alt="Logo CBT Integrated GForm"></div>
+        <div class="brand-school">Tes Kemampuan Akademik • 2026</div>
+      </div>
 
-<div id="customModal" class="modal-overlay">
-    <div class="modal-box">
-        <div id="modalIcon" class="modal-icon"></div>
-        <div id="modalTitle" class="modal-title"></div>
-        <div id="modalText" class="modal-text"></div>
-        <div id="modalButtons" class="modal-buttons"></div>
+      <div class="logo" aria-label="Logo CBT Integrated GForm">
+        <img src="https://yanuar-moga.github.io/cbt/assets/logo.png" alt="Logo CBT Integrated GForm">
+      </div>
+
+      <div class="brand-bottom">
+        <p class="eyebrow">Tes Kemampuan Akademik</p>
+        <h1>Computer Based Test</h1>
+        <p>Platform asesmen digital untuk pelaksanaan ujian yang terstruktur, aman, dan mudah digunakan.</p>
+        <div class="version">CBT Integrated GForm • v1.0</div>
+      </div>
+    </section>
+
+    <!-- CONTENT -->
+    <section class="content">
+      <div class="content-inner">
+
+        <!-- LOGIN -->
+        <section id="loginScreen" class="screen active">
+          <p class="title-kicker">Tes Kemampuan Akademik • 2026</p>
+          <h2>Computer Based Test</h2>
+          <div class="title-line"></div>
+
+          <div id="loginMessage" class="notice error" style="display:none"></div>
+
+          <form id="loginForm" novalidate>
+            <div class="field">
+              <label for="kelas">Kelas</label>
+              <select id="kelas" required><option value="">Memuat daftar kelas...</option></select>
+            </div>
+
+            <div class="field">
+              <label for="username">Username</label>
+              <select id="username" autocomplete="username" required disabled><option value="">Pilih kelas terlebih dahulu</option></select>
+            </div>
+
+            <div class="field">
+              <label for="password">Password</label>
+              <div class="password-row">
+                <input id="password" type="password" autocomplete="current-password" placeholder="Masukkan password" required>
+                <button class="toggle-pass" type="button" id="togglePassword" aria-label="Tampilkan password">◉</button>
+              </div>
+            </div>
+
+            <label class="check">
+              <input type="checkbox" id="showPassword">
+              Tampilkan Password
+            </label>
+
+            <div class="field">
+              <label for="token">Token</label>
+              <input id="token" type="text" autocomplete="off" placeholder="Masukkan token" required>
+            </div>
+
+            <div class="stack">
+              <button class="btn btn-primary" id="loginButton" type="submit">Masuk</button>
+              <button class="btn btn-blue" type="button" id="scheduleButton">Lihat Jadwal Token</button>
+              <button class="btn btn-secondary" type="button" id="resetButton">Reset Login / Sesi</button>
+            </div>
+          </form>
+
+        </section>
+
+        <!-- EXAM PREVIEW -->
+        <section id="examScreen" class="screen">
+          <div class="top-user">
+            <div class="user-chip">
+              <strong id="examName">-</strong>
+              <span id="examClass">-</span>
+            </div>
+            <button class="link-btn" id="logoutBeforeExam">Keluar</button>
+          </div>
+
+          <p class="title-kicker">VERIFIKASI SESI</p>
+          <h2 id="examMapel">Ujian</h2>
+          <div class="title-line"></div>
+
+          <div class="panel">
+            <div class="summary">
+              <div class="summary-item"><small>Kelas</small><strong id="sumKelas">-</strong></div>
+              <div class="summary-item"><small>Mata Pelajaran</small><strong id="sumMapel">-</strong></div>
+              <div class="summary-item"><small>Mulai</small><strong id="sumMulai">-</strong></div>
+              <div class="summary-item"><small>Selesai</small><strong id="sumSelesai">-</strong></div>
+            </div>
+          </div>
+
+          <div class="notice">
+            Pastikan data dan jadwal sudah benar. Tombol <b>Mulai Ujian</b> akan membuka Google Form yang ditentukan pada sheet JADWAL.
+          </div>
+
+          <div class="form-actions">
+            <button class="btn btn-primary" id="startExamButton">Mulai Ujian</button>
+            <button class="btn btn-secondary" id="backLoginButton">Kembali ke Login</button>
+          </div>
+
+          <div class="footer"><strong>CBT Integrated GForm</strong></div>
+        </section>
+
+        <!-- RUNNING EXAM -->
+        <section id="runningScreen" class="screen">
+          <p class="title-kicker">UJIAN BERLANGSUNG</p>
+          <h2 id="runningMapel">Ujian</h2>
+          <div class="title-line"></div>
+
+          <div class="notice" id="sessionRestoreNotice" style="display:none;margin-bottom:16px" role="status"></div>
+          <div class="notice success">
+            Selesaikan dan kirim seluruh jawaban pada Google Form yang dibuka di halaman CBT ini. Setelah terkirim, tekan <b>Sudah Kirim Jawaban</b>.
+          </div>
+
+          <div class="panel">
+            <div class="summary">
+              <div class="summary-item"><small>Peserta</small><strong id="runningName">-</strong></div>
+              <div class="summary-item"><small>Kelas</small><strong id="runningClass">-</strong></div>
+              <div class="summary-item"><small>Mulai</small><strong id="runningStart">-</strong></div>
+              <div class="summary-item"><small>Selesai</small><strong id="runningEnd">-</strong></div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button class="btn btn-blue" id="openFormButton">Tampilkan Google Form</button>
+            <button class="btn btn-primary" id="submitFormButton">Sudah Kirim Jawaban</button>
+            <button class="btn btn-secondary" id="logoutRunningButton">Keluar</button>
+          </div>
+
+          <div class="footer">Status sesi dicatat pada sheet <strong>SESI</strong> dan aktivitas pada <strong>LOG_AKTIVITAS</strong>.</div>
+        </section>
+
+        <!-- QUESTIONNAIRE -->
+        <section id="questionnaireScreen" class="screen">
+          <p class="title-kicker">EVALUASI</p>
+          <h2>Kuesioner Singkat</h2>
+          <div class="title-line"></div>
+
+          <div id="questionMessage" class="notice" style="margin-bottom:16px">
+            Berikan penilaian setelah menyelesaikan CBT.
+          </div>
+
+          <form id="questionnaireForm">
+            <div class="field">
+              <label>Rating kemudahan aplikasi</label>
+              <div class="rating-group">
+                <div class="rating-option"><input id="app1" type="radio" name="ratingAplikasi" value="1"><label for="app1">1</label></div>
+                <div class="rating-option"><input id="app2" type="radio" name="ratingAplikasi" value="2"><label for="app2">2</label></div>
+                <div class="rating-option"><input id="app3" type="radio" name="ratingAplikasi" value="3"><label for="app3">3</label></div>
+                <div class="rating-option"><input id="app4" type="radio" name="ratingAplikasi" value="4"><label for="app4">4</label></div>
+                <div class="rating-option"><input id="app5" type="radio" name="ratingAplikasi" value="5"><label for="app5">5</label></div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Rating kemudahan soal</label>
+              <div class="rating-group">
+                <div class="rating-option"><input id="soal1" type="radio" name="ratingSoal" value="1"><label for="soal1">1</label></div>
+                <div class="rating-option"><input id="soal2" type="radio" name="ratingSoal" value="2"><label for="soal2">2</label></div>
+                <div class="rating-option"><input id="soal3" type="radio" name="ratingSoal" value="3"><label for="soal3">3</label></div>
+                <div class="rating-option"><input id="soal4" type="radio" name="ratingSoal" value="4"><label for="soal4">4</label></div>
+                <div class="rating-option"><input id="soal5" type="radio" name="ratingSoal" value="5"><label for="soal5">5</label></div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="saran">Saran / masukan (opsional)</label>
+              <textarea id="saran" maxlength="1000" placeholder="Tuliskan saran atau kendala selama menggunakan CBT..."></textarea>
+            </div>
+
+            <button class="btn btn-primary" type="submit" id="questionnaireButton">Kirim Kuesioner</button>
+          </form>
+
+          <div class="footer"><strong>Terima kasih telah mengikuti asesmen.</strong></div>
+        </section>
+
+        <!-- FINISH -->
+        <section id="finishScreen" class="screen">
+          <p class="title-kicker">SELESAI</p>
+          <h2>Ujian Berhasil Dicatat</h2>
+          <div class="title-line"></div>
+
+          <div class="notice success">
+            Kuesioner berhasil disimpan dan sesi CBT telah ditandai selesai.
+          </div>
+
+          <div class="panel">
+            <div class="summary">
+              <div class="summary-item"><small>Peserta</small><strong id="finishName">-</strong></div>
+              <div class="summary-item"><small>Kelas</small><strong id="finishClass">-</strong></div>
+              <div class="summary-item"><small>Mata Pelajaran</small><strong id="finishMapel">-</strong></div>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" id="finishButton">Kembali ke Login</button>
+
+          <div class="footer"><strong>CBT Integrated GForm</strong><br>Silakan mengikuti instruksi berikutnya.</div>
+        </section>
+
+      </div>
+      <footer class="app-footer">
+        <button class="about-trigger" type="button" data-open-about aria-label="Tentang CBT Integrated GForm">
+          <img class="about-footer-logo" src="https://yanuar-moga.github.io/cbt/assets/logo.png" alt="">
+          <span class="about-footer-title">CBT Integrated GForm</span>
+        </button>
+      </footer>
+    </section>
+  </main>
+
+  <section id="googleFormOverlay" class="google-form-overlay" aria-hidden="true" aria-label="Google Form ujian">
+    <div class="google-form-toolbar">
+      <div class="exam-hud-wrap">
+        <div class="exam-hud-brand">
+          <img class="exam-hud-logo" src="https://yanuar-moga.github.io/cbt/assets/logo.png" alt="Logo CBT Integrated GForm">
+          <span id="embeddedStudentName" class="exam-hud-student">-</span>
+        </div>
+        <div class="exam-hud">
+          <strong id="embeddedFormTitle">Ujian CBT</strong>
+          <span class="exam-timer"><span>SISA WAKTU</span><strong id="examTimer">--:--:--</strong></span>
+        </div>
+      </div>
+      <div class="google-form-toolbar-actions">
+        <button class="btn btn-secondary" id="closeEmbeddedFormButton" type="button">Kembali ke CBT</button>
+        <button class="btn btn-primary" id="embeddedSubmitButton" type="button">Sudah kirim</button>
+      </div>
     </div>
-</div>
+    <!-- Desktop memakai iframe; mobile diarahkan ke halaman penuh karena Google Form lintas-domain dapat kehilangan stylesheet di iframe. -->
+    <iframe id="googleFormFrame" title="Formulir ujian CBT" referrerpolicy="strict-origin-when-cross-origin" allow="fullscreen"></iframe>
+    <footer class="google-form-footer">
+      <button class="about-trigger" type="button" data-open-about aria-label="Tentang CBT Integrated GForm">
+        <img class="about-footer-logo" src="https://yanuar-moga.github.io/cbt/assets/logo.png" alt="">
+        <span class="about-footer-title">CBT Integrated GForm</span>
+      </button>
+    </footer>
+  </section>
 
-
-<!-- Lapisan pengunci: hanya PIN admin yang dapat menutupnya -->
-<div id="antiTabOverlay" class="anti-tab-overlay" role="dialog" aria-modal="true" aria-labelledby="antiTabTitle" aria-hidden="true">
-    <div class="anti-tab-dialog">
-        <div id="antiTabWarningContent">
-            <div class="anti-tab-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
-            <h2 id="antiTabTitle" class="anti-tab-title">Peringatan: Dilarang Membuka Tab</h2>
-            <p class="anti-tab-message">Perpindahan atau pembukaan tab lain terdeteksi. Halaman ujian dikunci. Masukkan PIN admin untuk kembali mengerjakan soal.</p>
-            <p class="anti-tab-popup-timer">Halaman ujian akan terbuka otomatis dalam:<strong id="antiTabPopupTimer">05:00</strong></p>
+  <dialog id="scheduleDialog" class="schedule-dialog" aria-labelledby="scheduleTitle">
+    <div class="schedule-dialog-inner">
+      <header class="schedule-dialog-head">
+        <div>
+          <h2 id="scheduleTitle">Jadwal Ujian</h2>
+          <p>Informasi jadwal Ujian</p>
         </div>
-        <form id="antiTabPinForm" autocomplete="off">
-            <input id="antiTabPin" class="anti-tab-pin" type="password" inputmode="numeric" maxlength="20" placeholder="PIN admin" aria-label="PIN admin" required>
-            <p id="antiTabError" class="anti-tab-error" aria-live="polite"></p>
-            <button class="anti-tab-unlock" type="submit">Buka Kunci &amp; Lanjutkan</button>
-        </form>
+        <button id="closeScheduleButton" class="schedule-close" type="button" aria-label="Tutup jadwal">×</button>
+      </header>
+      <div class="schedule-dialog-body">
+        <p id="scheduleStatus" class="schedule-message" role="status">Memuat jadwal...</p>
+        <div class="schedule-table-wrap">
+          <table class="schedule-table">
+            <thead><tr><th>Tanggal</th><th>Kelas</th><th>Mapel</th><th>Mulai</th><th>Selesai</th></tr></thead>
+            <tbody id="scheduleRows"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
-</div>
-<audio id="antiTabWarningAudio" src="https://yanuar-moga.github.io/cbt/assets/warning.mp3" preload="auto" loop></audio>
-
-<div class="container max-normal" id="mainContainer">
-
-    <div class="card">
-
-        <!-- KONFIRMASI -->
-        <div id="sec-konfirmasi" class="wizard-section active animate__animated animate__fadeIn">
-
-            <h2>Konfirmasi Data Peserta</h2>
-
-            <p class="section-desc">
-                Pastikan identitas Anda sudah sesuai sebelum memulai ujian
-            </p>
-
-            <table class="info-table">
-                <tr>
-                    <td>Nama Siswa</td>
-                    <td id="conf-nama">Memuat...</td>
-                </tr>
-                <tr>
-                    <td>Username / NISN</td>
-                    <td id="conf-user">Memuat...</td>
-                </tr>
-                <tr>
-                    <td>Kelas</td>
-                    <td id="conf-kelas">Memuat...</td>
-                </tr>
-                <tr>
-                    <td>Mata Pelajaran</td>
-                    <td>Informatika</td>
-                </tr>
-            </table>
-
-            <div class="tp-container">
-
-                <button id="btn-tp1"
-                        class="btn-tp"
-                        style="background-color: var(--text-light);">
-                    TP 1: Memuat...
-                </button>
-
-                <button id="btn-tp2"
-                        class="btn-tp"
-                        style="background-color: var(--text-light);">
-                    TP 2: Memuat...
-                </button>
-
-            </div>
-
-            <button class="btn btn-block"
-                    id="btnMulaiUjian"
-                    onclick="mulaiUjian()"
-                    disabled>
-                MENGUNDUH SOAL...
-            </button>
-
-            <div class="app-footer">
-
-                <span>SIMPATIK V 1.0 Dev by MB &copy; 2026</span>
-
-                <button class="btn-logout-footer"
-                        onclick="logoutFinal(this)">
-                    <i class="fa-solid fa-right-from-bracket"></i>
-                    Keluar
-                </button>
-
-            </div>
-
-        </div>
-
-
-        <!-- SOAL -->
-        <div id="sec-soal"
-             class="wizard-section animate__animated animate__fadeIn">
-
-            <h2>Lembar Soal Ujian</h2>
-
-            <p class="section-desc"
-               id="info-progres">
-                Soal n dari n
-            </p>
-
-            <div class="cbt-layout">
-
-                <div>
-
-                    <div class="box-soal">
-
-                        <div id="konten-soal"></div>
-
-                        <img id="gambar-soal"
-                             class="img-soal"
-                             src=""
-                             alt="Gambar Soal">
-
-                    </div>
-
-                    <div class="opsi-jawaban"
-                         id="konten-opsi">
-                    </div>
-
-                    <div class="nav-soal">
-
-                        <button class="btn"
-                                id="btnPrev"
-                                onclick="soalSebelumnya()">
-
-                            <i class="fa-solid fa-chevron-left"></i>
-                            Kembali
-
-                        </button>
-
-                        <button class="btn btn-success"
-                                id="btnNext"
-                                onclick="soalBerikutnya()">
-
-                            Selanjutnya
-                            <i class="fa-solid fa-chevron-right"></i>
-
-                        </button>
-
-                    </div>
-
-                </div>
-
-                <div class="cbt-nav-panel">
-
-                    <div class="nav-panel-title">
-
-                        <i class="fa-solid fa-th"></i>
-
-                        <span>Nomor Soal</span>
-
-                    </div>
-
-                    <div class="grid-nomor"
-                         id="gridNomorCbt">
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- NILAI -->
-        <div id="sec-nilai"
-             class="wizard-section animate__animated animate__fadeIn">
-
-            <h2>Hasil Nilai Ujian</h2>
-
-            <p class="section-desc">
-                Ujian selesai. Nilai Anda telah direkam oleh sistem
-            </p>
-
-            <div class="nilai-circle"
-                 id="txtSkor">
-                0
-            </div>
-
-            <div class="tp-container"
-                 id="analisis-tp-container">
-            </div>
-
-            <p style="
-                text-align:center;
-                color:var(--text-light);
-                font-size:13px;
-                margin-bottom:25px;
-                line-height:1.5;
-            ">
-
-                <span style="
-                    color:var(--belum-tuntas);
-                    font-weight:bold;
-                ">
-                    *Catatan:
-                </span>
-
-                Tombol berwarna orange menandakan nilai di bawah KKM.
-                Anda dapat mengekliknya jika ingin langsung mengulang materi tersebut.
-
-            </p>
-
-            <div id="remedial-clear-area" class="remedial-note">
-                <strong><i class="fa-solid fa-broom"></i> MODE REMEDIAL</strong><br>
-                Klik tombol TP berwarna orange di atas. Sebelum remedial dimulai, sistem akan otomatis membersihkan data sementara pengerjaan lama dari browser.
-            </div>
-
-            <button class="btn btn-block"
-                    id="btnPindahKuesioner"
-                    onclick="pindahKe('sec-kuesioner')"
-                    style="display:none;">
-
-                ISI EVALUASI & KUESIONER
-                <i class="fa-solid fa-pen-to-square"></i>
-
-            </button>
-
-            <div class="app-footer">
-
-                <span>SIMPATIK V 1.0 Dev by MB &copy; 2026</span>
-
-                <button class="btn-logout-footer"
-                        onclick="logoutFinal(this)">
-
-                    <i class="fa-solid fa-right-from-bracket"></i>
-                    Keluar
-
-                </button>
-
-            </div>
-
-        </div>
-
-
-        <!-- KUESIONER -->
-        <div id="sec-kuesioner"
-             class="wizard-section animate__animated animate__fadeIn">
-
-            <h2>Penilaian Aplikasi</h2>
-
-            <p class="section-desc">
-                Bantu kami meningkatkan kualitas sistem ujian ini
-            </p>
-
-            <div style="margin-bottom:20px;">
-
-                <label style="
-                    display:block;
-                    font-size:14px;
-                    font-weight:600;
-                    color:var(--text-dark);
-                    margin-bottom:10px;
-                    text-align:center;
-                ">
-                    Berikan Rating Aplikasi:
-                </label>
-
-                <div class="star-rating">
-
-                    <i class="fa-solid fa-star"
-                       data-rating="5"
-                       onclick="setStar(5)">
-                    </i>
-
-                    <i class="fa-solid fa-star"
-                       data-rating="4"
-                       onclick="setStar(4)">
-                    </i>
-
-                    <i class="fa-solid fa-star"
-                       data-rating="3"
-                       onclick="setStar(3)">
-                    </i>
-
-                    <i class="fa-solid fa-star"
-                       data-rating="2"
-                       onclick="setStar(2)">
-                    </i>
-
-                    <i class="fa-solid fa-star"
-                       data-rating="1"
-                       onclick="setStar(1)">
-                    </i>
-
-                </div>
-
-            </div>
-
-            <div style="margin-bottom:20px;">
-
-                <label style="
-                    display:block;
-                    font-size:14px;
-                    font-weight:600;
-                    color:var(--text-dark);
-                    margin-bottom:10px;
-                    text-align:center;
-                ">
-                    Tingkat Kemudahan Soal Ujian:
-                </label>
-
-                <div class="radio-group">
-
-                    <label class="radio-btn"
-                           onclick="setRadio(this)">
-
-                        Mudah
-
-                        <input type="radio"
-                               name="mudah_soal"
-                               value="Mudah">
-
-                    </label>
-
-                    <label class="radio-btn"
-                           onclick="setRadio(this)">
-
-                        Sedang
-
-                        <input type="radio"
-                               name="mudah_soal"
-                               value="Sedang">
-
-                    </label>
-
-                    <label class="radio-btn"
-                           onclick="setRadio(this)">
-
-                        Sulit
-
-                        <input type="radio"
-                               name="mudah_soal"
-                               value="Sulit">
-
-                    </label>
-
-                </div>
-
-            </div>
-
-            <div>
-
-                <label style="
-                    display:block;
-                    font-size:14px;
-                    font-weight:600;
-                    color:var(--text-dark);
-                    margin-bottom:8px;
-                ">
-                    Kritik & Saran:
-                </label>
-
-                <textarea id="saranText"
-                          placeholder="Tuliskan masukan atau kendala teknis Anda di sini..."></textarea>
-
-            </div>
-
-            <button class="btn btn-block"
-                    id="btnKuesioner"
-                    onclick="kirimKuesioner()">
-
-                <div class="spinner"
-                     id="spinKuesioner">
-                </div>
-
-                <span id="txtKuesioner">
-                    KIRIM EVALUASI
-                </span>
-
-            </button>
-
-        </div>
-
-
-        <!-- THANK YOU -->
-        <div id="sec-thanks"
-             class="wizard-section animate__animated animate__zoomIn">
-
-            <div class="thankyou-wrapper">
-
-                <div class="thankyou-icon">
-                    <i class="fa-solid fa-circle-check"></i>
-                </div>
-
-                <h2>Terima Kasih!</h2>
-
-                <p style="
-                    color:var(--text-light);
-                    font-size:14px;
-                    line-height:1.6;
-                    margin-bottom:30px;
-                ">
-
-                    Seluruh rangkaian evaluasi dan hasil ujian Anda telah berhasil
-                    terekam dengan aman ke sistem database sekolah.
-
-                </p>
-
-                <button class="btn btn-block"
-                        style="background:#ef4444;"
-                        onclick="logoutFinal(this)">
-
-                    <i class="fa-solid fa-right-from-bracket"></i>
-
-                    KELUAR APLIKASI (LOGOUT)
-
-                </button>
-
-            </div>
-
-        </div>
-
+  </dialog>
+
+  <dialog id="aboutDialog" class="about-dialog" aria-labelledby="aboutTitle">
+    <div class="about-content">
+      <img class="about-logo" src="https://yanuar-moga.github.io/cbt/assets/logo.png" alt="Logo aplikasi CBT">
+      <h2 id="aboutTitle">CBT Integrated GForm</h2>
+      <p class="about-version">Versi aplikasi V 1.0</p>
+      <p>Build 27 September 2026</p>
+      <p>Develop by MB</p>
+      <button id="closeAboutButton" class="btn btn-primary about-close" type="button">Tutup</button>
     </div>
+  </dialog>
 
-</div>
+  <audio id="warningAudio" src="https://yanuar-moga.github.io/cbt/assets/warning.mp3" preload="auto"></audio>
 
+  <section id="violationOverlay" class="violation-overlay" role="alertdialog" aria-modal="true" aria-labelledby="violationTitle" aria-describedby="violationDescription">
+    <div class="violation-card">
+      <div class="violation-mark" aria-hidden="true">!</div>
+      <h2 id="violationTitle">PELANGGARAN TERDETEKSI</h2>
+      <p id="violationDescription">Anda berpindah dari Lembar Soal atau membuka tab/jendela lain. Masukkan PIN Admin untuk membuka lebih awal, atau tunggu hingga hitung mundur selesai.</p>
+      <div class="violation-count" id="violationCount">Pelanggaran 1</div>
+      <div class="violation-countdown" id="violationCountdown" aria-live="assertive">Halaman ujian terbuka otomatis dalam 05:00</div>
+      <form id="adminPinForm">
+        <label for="adminPinInput">Masukkan PIN Admin untuk melanjutkan</label>
+        <input id="adminPinInput" type="password" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="PIN Admin" required>
+        <p id="adminPinError" class="violation-error" aria-live="polite"></p>
+        <button class="btn btn-primary" type="submit">Verifikasi PIN Admin</button>
+      </form>
+      <small>Jangan tutup atau muat ulang halaman. Minta bantuan pengawas jika Anda belum memperoleh izin.</small>
+    </div>
+  </section>
 
-<script>
-
-const SCRIPT_URL =
-"https://script.google.com/macros/s/AKfycbz0YlE-aJzBvCQDYcnY1H49oAa7VSd0RWt_5p9D1vC5vJgIkf9GMWC4K8JVmXkSg-8Vcg/exec";
-
-
-let dataSiswa = {};
-let backupMasterSoal = [];
-let masterSoal = [];
-let jawabanSiswa = {};
-let indeksSekarang = 0;
-let selectedRating = 0;
-let kkmServer = 78;
-
-let sedangLogout = false;
-
-/* =========================================================
-   PERLINDUNGAN PINDAH TAB / PIN ADMIN
-========================================================= */
-const ADMIN_PIN_ANTI_TAB = "1212";
-const ANTI_TAB_LOCK_KEY = (() => {
-    let identifier = "default";
-    try {
-        const session = JSON.parse(localStorage.getItem("sesi_siswa") || "{}");
-        identifier = session.username || session.id_login || "default";
-    } catch (error) {}
-    return "simpatik_tab_lock_" + String(identifier).toLowerCase().slice(0, 100);
-})();
-const ANTI_TAB_PENALTY_DEADLINE_KEY = ANTI_TAB_LOCK_KEY + "_penalty_deadline";
-const ANTI_TAB_PENALTY_MS = 5 * 60 * 1000;
-let antiTabLocked = false;
-let antiTabPenaltyTimer = null;
-
-const antiTabOverlay = document.getElementById("antiTabOverlay");
-const antiTabPinInput = document.getElementById("antiTabPin");
-const antiTabError = document.getElementById("antiTabError");
-const antiTabAudio = document.getElementById("antiTabWarningAudio");
-const antiTabMessage = document.querySelector(".anti-tab-message");
-const antiTabWarningContent = document.getElementById("antiTabWarningContent");
-const antiTabPopupTimerText = document.getElementById("antiTabPopupTimer");
-
-function halamanSoalAktif() {
-    return document.getElementById("sec-soal")?.classList.contains("active") === true;
-}
-
-function simpanStatusKunciTab(terkunci) {
-    try {
-        if (terkunci) localStorage.setItem(ANTI_TAB_LOCK_KEY, "1");
-        else localStorage.removeItem(ANTI_TAB_LOCK_KEY);
-    } catch (error) {
-        console.warn("Status kunci tab tidak dapat disimpan:", error);
-    }
-}
-
-function putarAudioPeringatan() {
-    if (!antiTabLocked || !antiTabAudio) return;
-    antiTabAudio.loop = true;
-    const playPromise = antiTabAudio.play();
-    if (playPromise && typeof playPromise.catch === "function") playPromise.catch(() => {});
-}
-
-function bukaKunciOtomatisSetelahPenalti() {
-    if (antiTabPenaltyTimer !== null) {
-        window.clearInterval(antiTabPenaltyTimer);
-        antiTabPenaltyTimer = null;
-    }
-    antiTabLocked = false;
-    simpanStatusKunciTab(false);
-    antiTabOverlay.classList.remove("active");
-    antiTabOverlay.setAttribute("aria-hidden", "true");
-    document.body.classList.remove("anti-tab-locked");
-    antiTabAudio.pause();
-    antiTabAudio.currentTime = 0;
-    antiTabPinInput.value = "";
-    antiTabError.textContent = "";
-    try { localStorage.removeItem(ANTI_TAB_PENALTY_DEADLINE_KEY); } catch (error) {}
-}
-
-function mulaiCountdownPenalti(pulihkan = false) {
-    if (antiTabPenaltyTimer !== null) {
-        window.clearInterval(antiTabPenaltyTimer);
-        antiTabPenaltyTimer = null;
-    }
-
-    let deadline = 0;
-    try {
-        const tersimpan = Number(localStorage.getItem(ANTI_TAB_PENALTY_DEADLINE_KEY));
-        deadline = pulihkan && tersimpan > 0 ? tersimpan : Date.now() + ANTI_TAB_PENALTY_MS;
-        localStorage.setItem(ANTI_TAB_PENALTY_DEADLINE_KEY, String(deadline));
-    } catch (error) {
-        deadline = Date.now() + ANTI_TAB_PENALTY_MS;
-    }
-
-    const perbarui = () => {
-        const sisaMs = Math.max(0, deadline - Date.now());
-        const totalDetik = Math.ceil(sisaMs / 1000);
-        const menit = String(Math.floor(totalDetik / 60)).padStart(2, "0");
-        const detik = String(totalDetik % 60).padStart(2, "0");
-        antiTabPopupTimerText.textContent = `${menit}:${detik}`;
-        if (sisaMs <= 0) bukaKunciOtomatisSetelahPenalti();
+  <script>
+    // Catatan: aplikasi harus dibuka melalui URL HTTPS, bukan file:/// dari penyimpanan HP.
+    const CONFIG = {
+      APP_NAME: "CBT Integrated GForm",
+      GAS_WEB_APP_URL: "https://script.google.com/macros/s/AKfycbxpt5jhgpFV69cssShSlesrs3mXT-cQ25iqm3lrHGYJ2M-24l8XxKCHh4ov_Ft9KRhN/exec",
+      DEFAULT_GOOGLE_FORM_URL: "https://docs.google.com/forms/d/e/1FAIpQLSdwBS3rLkjRjn8fuw-eArPhGHwVI6BuqWM8MuICHZ4kjlacLg/viewform?usp=header",
+      ADMIN_PIN: "1212",
+      VIOLATION_STORAGE_KEY: "cbt_exam_violation_v1",
+      VIOLATION_DURATION_MS: 5 * 60 * 1000
     };
 
-    perbarui();
-    if (antiTabLocked && Date.now() < deadline) {
-        antiTabPenaltyTimer = window.setInterval(perbarui, 1000);
+    const state = { sessionId:"", user:null, jadwal:null, googleFormUrl:"", examActive:false, examTimerId:null };
+    let warningAudioUnlocked=false;
+    let warningSoundPending=false;
+    let violationCountdownId=null;
+    const $ = id => document.getElementById(id);
+
+    function unlockWarningAudio(){
+      const audio=$("warningAudio");
+      if(!audio)return;
+      if($("violationOverlay").classList.contains("active")){startWarningSound();return;}
+      if(warningAudioUnlocked)return;
+      audio.muted=true;
+      const attempt=audio.play();
+      if(attempt&&typeof attempt.then==="function"){
+        attempt.then(()=>{audio.pause();audio.currentTime=0;audio.muted=false;warningAudioUnlocked=true;}).catch(()=>{audio.muted=false;});
+      }else{audio.pause();audio.currentTime=0;audio.muted=false;warningAudioUnlocked=true;}
     }
-}
-
-function kunciKarenaPindahTab(alasan = "pindah-tab", pulihkanKunci = false) {
-    if (!pulihkanKunci && !halamanSoalAktif()) return;
-    const sudahTerkunci = antiTabLocked;
-    antiTabLocked = true;
-    simpanStatusKunciTab(true);
-    document.body.classList.add("anti-tab-locked");
-    antiTabOverlay.classList.add("active");
-    antiTabOverlay.setAttribute("aria-hidden", "false");
-    antiTabWarningContent.hidden = false;
-    antiTabMessage.textContent = alasan === "pulihkan"
-        ? "Pelanggaran tab sebelumnya masih terkunci. Penalti lima menit tetap berjalan; PIN admin dapat membuka lebih awal."
-        : "Tab lain terdeteksi. Sebagai penalti waktu, halaman ujian terkunci selama lima menit. Halaman terbuka otomatis saat hitung mundur habis; PIN admin dapat membuka lebih awal.";
-    antiTabError.textContent = "";
-    putarAudioPeringatan();
-
-    if (!sudahTerkunci || pulihkanKunci) {
-        mulaiCountdownPenalti(pulihkanKunci);
+    function startWarningSound(){
+      const audio=$("warningAudio");
+      if(!audio)return;
+      if(!audio.paused&&!audio.ended)return;
+      audio.currentTime=0;audio.muted=false;audio.volume=1;audio.loop=true;
+      const attempt=audio.play();
+      if(attempt&&typeof attempt.then==="function")attempt.then(()=>{warningSoundPending=false;warningAudioUnlocked=true;}).catch(()=>{warningSoundPending=true;});
     }
-    window.setTimeout(() => { if (antiTabLocked) antiTabPinInput.focus(); }, 100);
-}
-
-function bukaKunciDenganPin(pin) {
-    if (String(pin).trim() !== ADMIN_PIN_ANTI_TAB) {
-        antiTabError.textContent = "PIN admin salah. Halaman ujian masih terkunci.";
-        antiTabPinInput.value = "";
-        antiTabPinInput.focus();
-        putarAudioPeringatan();
-        return false;
-    }
-    if (antiTabPenaltyTimer !== null) window.clearInterval(antiTabPenaltyTimer);
-    antiTabPenaltyTimer = null;
-    antiTabLocked = false;
-    simpanStatusKunciTab(false);
-    antiTabOverlay.classList.remove("active");
-    antiTabOverlay.setAttribute("aria-hidden", "true");
-    document.body.classList.remove("anti-tab-locked");
-    antiTabPinInput.value = "";
-    antiTabError.textContent = "";
-    antiTabAudio.pause();
-    antiTabAudio.currentTime = 0;
-    try { localStorage.removeItem(ANTI_TAB_PENALTY_DEADLINE_KEY); } catch (error) {}
-    return true;
-}
-
-// Memulihkan hukuman jika halaman direload sebelum lima menit berlalu.
-try {
-    if (localStorage.getItem(ANTI_TAB_LOCK_KEY) === "1") kunciKarenaPindahTab("pulihkan", true);
-} catch (error) {
-    console.warn("Status kunci tab tidak dapat dibaca:", error);
-}
-
-document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "hidden" && halamanSoalAktif()) kunciKarenaPindahTab();
-    else if (antiTabLocked) {
-        putarAudioPeringatan();
-        window.setTimeout(() => antiTabPinInput.focus(), 50);
-    }
-});
-document.addEventListener("contextmenu", event => event.preventDefault(), true);
-function cegahBukaTabDariTautan(event) {
-    const anchor = event.target && event.target.closest ? event.target.closest("a[href]") : null;
-    if (!anchor) return;
-    const targetBaru = (anchor.getAttribute("target") || "").toLowerCase() === "_blank";
-    const klikModifikasi = event.ctrlKey || event.metaKey || event.shiftKey || event.button === 1;
-    if (targetBaru || klikModifikasi) {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        kunciKarenaPindahTab();
-    }
-}
-document.addEventListener("click", cegahBukaTabDariTautan, true);
-document.addEventListener("auxclick", event => {
-    if (event.button === 1) cegahBukaTabDariTautan(event);
-}, true);
-document.addEventListener("keydown", event => {
-    const key = String(event.key || "").toLowerCase();
-    const modifier = event.ctrlKey || event.metaKey;
-    const newTabOrWindow = modifier && (key === "t" || key === "n" || (event.shiftKey && key === "n"));
-    if (newTabOrWindow) {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        kunciKarenaPindahTab();
-    }
-    if (antiTabLocked) putarAudioPeringatan();
-}, true);
-try {
-    window.open = function () { kunciKarenaPindahTab(); return null; };
-} catch (error) {
-    console.warn("Pemblokiran window.open tidak didukung:", error);
-}
-["pointerdown", "touchstart"].forEach(eventName => {
-    document.addEventListener(eventName, () => { if (antiTabLocked) putarAudioPeringatan(); }, { passive: true });
-});
-document.getElementById("antiTabPinForm").addEventListener("submit", event => {
-    event.preventDefault();
-    bukaKunciDenganPin(antiTabPinInput.value);
-});
-
-
-/* =========================================================
-   MODAL
-========================================================= */
-
-function showModal({
-    type,
-    title,
-    text,
-    confirmText = "OK",
-    cancelText = "",
-    onConfirm,
-    onCancel
-}) {
-
-    const modal =
-        document.getElementById("customModal");
-
-    const iconContainer =
-        document.getElementById("modalIcon");
-
-    const titleContainer =
-        document.getElementById("modalTitle");
-
-    const textContainer =
-        document.getElementById("modalText");
-
-    const buttonsContainer =
-        document.getElementById("modalButtons");
-
-
-    let iconHtml = "";
-
-    if (type === "success") {
-
-        iconHtml =
-        `<i class="fa-solid fa-circle-check modal-icon success animate__animated animate__bounceIn"></i>`;
-
-    }
-    else if (type === "warning") {
-
-        iconHtml =
-        `<i class="fa-solid fa-triangle-exclamation modal-icon warning animate__animated animate__shakeX"></i>`;
-
-    }
-    else {
-
-        iconHtml =
-        `<i class="fa-solid fa-circle-xmark modal-icon error animate__animated animate__headShake"></i>`;
-
+    function stopWarningSound(){
+      const audio=$("warningAudio");
+      if(!audio)return;
+      audio.loop=false;audio.pause();audio.currentTime=0;warningSoundPending=false;
     }
 
+    document.addEventListener("pointerdown",unlockWarningAudio,{capture:true});
+    document.addEventListener("keydown",unlockWarningAudio,{capture:true});
 
-    iconContainer.innerHTML = iconHtml;
-    titleContainer.innerText = title;
-    textContainer.innerText = text;
-
-    buttonsContainer.innerHTML = "";
-
-
-    const btnConfirm =
-        document.createElement("button");
-
-    btnConfirm.className =
-        "modal-btn modal-btn-primary";
-
-    btnConfirm.innerText =
-        confirmText;
-
-    btnConfirm.onclick = () => {
-
-        modal.classList.remove("show");
-
-        if (onConfirm) {
-            onConfirm();
-        }
-
-    };
-
-    buttonsContainer.appendChild(btnConfirm);
-
-
-    if (cancelText) {
-
-        const btnCancel =
-            document.createElement("button");
-
-        btnCancel.className =
-            "modal-btn modal-btn-secondary";
-
-        btnCancel.innerText =
-            cancelText;
-
-        btnCancel.onclick = () => {
-
-            modal.classList.remove("show");
-
-            if (onCancel) {
-                onCancel();
-            }
-
-        };
-
-        buttonsContainer.appendChild(btnCancel);
-
+    function showScreen(id){
+      document.querySelectorAll(".screen").forEach(el=>el.classList.remove("active"));
+      const el=$(id); if(el) el.classList.add("active");
+      window.scrollTo({top:0,behavior:"smooth"});
     }
-
-
-    modal.classList.add("show");
-
-}
-
-
-/* =========================================================
-   LOAD SESSION
-========================================================= */
-
-window.addEventListener(
-    "DOMContentLoaded",
-    async () => {
-
-        const session =
-            localStorage.getItem("sesi_siswa");
-
-
-        if (!session) {
-
-            window.location.href =
-                "index.html";
-
-            return;
-
-        }
-
-
-        try {
-
-            dataSiswa =
-                JSON.parse(session);
-
-        }
-        catch (error) {
-
-            localStorage.clear();
-
-            window.location.href =
-                "index.html";
-
-            return;
-
-        }
-
-
-        if (
-            !dataSiswa.username &&
-            dataSiswa.id_login
-        ) {
-
-            const pecah =
-                dataSiswa.id_login.split("_");
-
-            if (pecah.length > 1) {
-
-                dataSiswa.username =
-                    pecah.slice(1).join("_");
-
-            }
-
-        }
-
-
-        document.getElementById(
-            "conf-nama"
-        ).innerText =
-            dataSiswa.nama || "-";
-
-
-        document.getElementById(
-            "conf-user"
-        ).innerText =
-            dataSiswa.username || "Tidak Ditemukan";
-
-
-        document.getElementById(
-            "conf-kelas"
-        ).innerText =
-            dataSiswa.kelas || "-";
-
-
-        aturTombolIndikatorTP();
-
-        await muatDataSoal();
-
-        /*
-         * Jika siswa sebelumnya menekan tombol remedial, halaman
-         * sengaja dimuat ulang setelah data sesi sementara dibersihkan.
-         * Flag ini membuat remedial dilanjutkan otomatis.
-         */
-        const remedialPending =
-            sessionStorage.getItem("simpatik_remedial_pending");
-
-        if (remedialPending) {
-            sessionStorage.removeItem("simpatik_remedial_pending");
-
-            try {
-                const kodeTP = remedialPending;
-                const soalRemidi = backupMasterSoal.filter(s => {
-                    const noSoal = parseInt(s.no);
-                    return kodeTP === "TP1"
-                        ? noSoal >= 1 && noSoal <= 10
-                        : kodeTP === "TP2"
-                            ? noSoal >= 11 && noSoal <= 20
-                            : false;
-                });
-
-                if (soalRemidi.length > 0) {
-                    masterSoal = soalRemidi;
-                    mulaiUjian();
-                }
-            } catch (e) {
-                console.error("Gagal melanjutkan remedial:", e);
-            }
-        }
-
+    function setMessage(id,message,type="error"){
+      const el=$(id); if(!el)return;
+      el.textContent=message; el.className="notice "+type; el.style.display="block";
     }
-);
-
-
-/* =========================================================
-   STATUS TP
-========================================================= */
-
-function aturTombolIndikatorTP() {
-
-    const btnTP1 =
-        document.getElementById("btn-tp1");
-
-    const btnTP2 =
-        document.getElementById("btn-tp2");
-
-
-    const statusTP =
-        dataSiswa.status_tp ||
-        {
-            tp1: "BELUM TUNTAS",
-            tp2: "BELUM TUNTAS"
-        };
-
-
-    if (statusTP.tp1 === "TUNTAS") {
-
-        btnTP1.style.backgroundColor =
-            "var(--tuntas)";
-
-        btnTP1.innerHTML =
-            `<i class="fa-solid fa-circle-check"></i>
-             TP 1 (Tuntas)`;
-
+    function hideMessage(id){ const el=$(id); if(el)el.style.display="none"; }
+    function setButtonLoading(button,loading,text){
+      if(!button)return;
+      if(loading){button.disabled=true;button.dataset.originalText=button.textContent;button.innerHTML='<span class="loading"><span class="spinner"></span>'+text+'</span>';}
+      else{button.disabled=false;button.textContent=button.dataset.originalText||text||"Simpan";}
     }
-    else {
-
-        btnTP1.style.backgroundColor =
-            "var(--belum-tuntas)";
-
-        btnTP1.innerHTML =
-            `<i class="fa-solid fa-circle-xmark"></i>
-             TP 1 (Belum)`;
-
+    function formatValue(v){return v===null||v===undefined||v===""?"-":String(v);}
+    function parseTimeParts(value){
+      if(value===null||value===undefined||value==="")return null;
+      if(typeof value==="number"){
+        // Kolom E/F Google Sheets dapat mengirim jam sebagai pecahan 1 hari.
+        const fraction=((value%1)+1)%1;
+        const total=Math.round(fraction*24*60);
+        return {hour:Math.floor(total/60)%24,minute:total%60};
+      }
+      const text=String(value).trim();
+      const direct=text.match(/(?:^|T|\s)(\d{1,2}):(\d{2})(?::(\d{2}))?/);
+      if(direct){
+        const hour=Number(direct[1]),minute=Number(direct[2]);
+        if(hour<=23&&minute<=59)return {hour,minute};
+      }
+      const date=new Date(text);
+      if(Number.isNaN(date.getTime()))return null;
+      const parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Jakarta",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(date);
+      const obj=Object.fromEntries(parts.filter(p=>p.type!=="literal").map(p=>[p.type,p.value]));
+      const hour=Number(obj.hour),minute=Number(obj.minute);
+      return hour<=23&&minute<=59?{hour,minute}:null;
     }
-
-
-    if (statusTP.tp2 === "TUNTAS") {
-
-        btnTP2.style.backgroundColor =
-            "var(--tuntas)";
-
-        btnTP2.innerHTML =
-            `<i class="fa-solid fa-circle-check"></i>
-             TP 2 (Tuntas)`;
-
+    function parseDateParts(value){
+      if(value===null||value===undefined||value==="")return null;
+      const text=String(value).trim();
+      let match=text.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
+      if(match){
+        const year=Number(match[1]),month=Number(match[2]),day=Number(match[3]);
+        return year>=2000&&month>=1&&month<=12&&day>=1&&day<=31?{year,month,day}:null;
+      }
+      match=text.match(/^(\d{1,2})[\/]([0-9]{1,2})[\/]((?:20)\d{2})/);
+      if(match){
+        const day=Number(match[1]),month=Number(match[2]),year=Number(match[3]);
+        return month<=12&&day<=31?{year,month,day}:null;
+      }
+      const date=new Date(text);
+      if(Number.isNaN(date.getTime()))return null;
+      const parts=getJakartaParts(date);
+      const year=Number(parts.year),month=Number(parts.month),day=Number(parts.day);
+      // Tahun 1899/1900 adalah tanggal dasar dari nilai waktu Sheets, bukan tanggal ujian.
+      return year>=2000?{year,month,day}:null;
     }
-    else {
-
-        btnTP2.style.backgroundColor =
-            "var(--belum-tuntas)";
-
-        btnTP2.innerHTML =
-            `<i class="fa-solid fa-circle-xmark"></i>
-             TP 2 (Belum)`;
-
+    function formatTimeValue(value){
+      const parts=parseTimeParts(value);
+      return parts?String(parts.hour).padStart(2,"0")+":"+String(parts.minute).padStart(2,"0"):"-";
     }
+    function getDevice(){return [navigator.userAgent,navigator.platform||"",window.innerWidth+"x"+window.innerHeight].join(" | ");}
 
-}
+    /*
+      Koneksi API yang kompatibel dengan GitHub Pages, hosting HTTPS,
+      dan sebagian besar browser HP. Apps Script mengembalikan JSONP,
+      sehingga frontend tidak bergantung pada CORS/fetch.
+    */
+    const API_TIMEOUT_MS=30000;
+    const API_RETRIES=2;
+    let apiRequestNumber=0;
 
-
-/* =========================================================
-   MUAT SOAL
-========================================================= */
-
-async function muatDataSoal() {
-
-    try {
-
-        const response =
-            await fetch(
-                SCRIPT_URL,
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                        "text/plain;charset=utf-8"
-                    },
-
-                    body:
-                    JSON.stringify({
-                        action: "get_soal",
-                        username: dataSiswa.username
-                    })
-                }
-            );
-
-
-        const result =
-            await response.json();
-
-
-        if (
-            result.status &&
-            result.data &&
-            result.data.length > 0
-        ) {
-
-            result.data.sort(
-                (a, b) =>
-                parseInt(a.no) -
-                parseInt(b.no)
-            );
-
-
-            backupMasterSoal =
-                JSON.parse(
-                    JSON.stringify(
-                        result.data
-                    )
-                );
-
-
-            if (result.kkm_config) {
-
-                kkmServer =
-                    parseInt(
-                        result.kkm_config
-                    );
-
-            }
-
-
-            const statusTP =
-                dataSiswa.status_tp ||
-                {
-                    tp1: "BELUM TUNTAS",
-                    tp2: "BELUM TUNTAS"
-                };
-
-
-            let soalTersaring =
-                result.data.filter(
-                    s => {
-
-                        const noSoal =
-                            parseInt(s.no);
-
-
-                        if (
-                            noSoal >= 1 &&
-                            noSoal <= 10 &&
-                            statusTP.tp1 ===
-                            "BELUM TUNTAS"
-                        ) {
-                            return true;
-                        }
-
-
-                        if (
-                            noSoal >= 11 &&
-                            noSoal <= 20 &&
-                            statusTP.tp2 ===
-                            "BELUM TUNTAS"
-                        ) {
-                            return true;
-                        }
-
-
-                        return false;
-
-                    }
-                );
-
-
-            const btnMulai =
-                document.getElementById(
-                    "btnMulaiUjian"
-                );
-
-
-            if (
-                soalTersaring.length === 0
-            ) {
-
-                masterSoal =
-                    result.data;
-
-                btnMulai.innerText =
-                    "SEMUA TP TUNTAS (LIHAT SOAL)";
-
-                btnMulai.style.backgroundColor =
-                    "var(--tuntas)";
-
-            }
-            else if (
-                statusTP.tp1 === "TUNTAS" ||
-                statusTP.tp2 === "TUNTAS"
-            ) {
-
-                masterSoal =
-                    soalTersaring;
-
-
-                document.querySelector(
-                    "#sec-konfirmasi .section-desc"
-                ).innerHTML =
-
-                `<span style="
-                    color:var(--belum-tuntas);
-                    font-weight:700;
-                ">
-                    <i class="fa-solid fa-bolt"></i>
-                    MODE ADAPTIF:
-                    Anda hanya perlu mengerjakan
-                    ${masterSoal.length} soal
-                    dari TP yang belum tuntas!
-                </span>`;
-
-
-                btnMulai.innerText =
-                    "MULAI REMIDIAL TP";
-
-            }
-            else {
-
-                masterSoal =
-                    result.data;
-
-                btnMulai.innerText =
-                    "MULAI UJIAN UTAMA";
-
-            }
-
-
-            btnMulai.disabled = false;
-
-        }
-        else {
-
-            showModal({
-                type: "error",
-                title: "Gagal",
-                text:
-                "Gagal memuat bank soal dari server database."
-            });
-
-        }
-
+    function getApiUrl(){
+      return String(CONFIG.GAS_WEB_APP_URL||"").trim().replace(/[?&]+$/g,"");
     }
-    catch (e) {
-
-        showModal({
-            type: "error",
-            title: "Koneksi Bermasalah",
-            text:
-            "Terjadi kendala jaringan saat mengunduh bank soal."
+    function getConnectionHint(){
+      if(!navigator.onLine)return "HP sedang offline. Aktifkan Wi-Fi/data seluler lalu coba lagi.";
+      if(location.protocol==="file:")return "File dibuka langsung dari penyimpanan HP. Upload HTML ke hosting HTTPS (contoh GitHub Pages), lalu buka URL HTTPS-nya.";
+      return "Periksa internet, matikan VPN/Private DNS/AdBlock, atau coba jaringan lain.";
+    }
+    function makeApiParams(action,payload={}){
+      const params=new URLSearchParams();
+      params.set("action",action);
+      params.set("_",Date.now().toString());
+      Object.keys(payload||{}).forEach(k=>{
+        const v=payload[k];
+        if(v!==undefined&&v!==null)params.set(k,typeof v==="object"?JSON.stringify(v):String(v));
+      });
+      return params;
+    }
+    async function apiJson(action,payload={}){
+      const endpoint=getApiUrl();
+      const controller=new AbortController();
+      const timer=setTimeout(()=>controller.abort(),API_TIMEOUT_MS);
+      try{
+        const response=await fetch(endpoint+"?"+makeApiParams(action,payload).toString(),{
+          method:"GET",
+          mode:"cors",
+          credentials:"omit",
+          cache:"no-store",
+          redirect:"follow",
+          signal:controller.signal,
+          headers:{"Accept":"application/json"}
         });
-
+        if(!response.ok)throw new Error("HTTP "+response.status);
+        const data=await response.json();
+        if(!data||typeof data!=="object")throw new Error("Respons JSON tidak valid");
+        return data;
+      }finally{clearTimeout(timer);}
+    }
+    function apiJsonp(action,payload={}){
+      return new Promise((resolve,reject)=>{
+        const endpoint=getApiUrl();
+        const callbackName="cbtCallback_"+Date.now()+"_"+(++apiRequestNumber)+"_"+Math.floor(Math.random()*100000);
+        const params=makeApiParams(action,payload);
+        params.set("callback",callbackName);
+        const script=document.createElement("script");
+        script.async=true;
+        script.charset="utf-8";
+        let finished=false;
+        let timer=null;
+        const cleanup=()=>{
+          if(timer)clearTimeout(timer);
+          if(script.parentNode)script.parentNode.removeChild(script);
+          try{delete window[callbackName];}catch(e){window[callbackName]=undefined;}
+        };
+        const fail=(message)=>{if(finished)return;finished=true;cleanup();reject(new Error(message));};
+        timer=setTimeout(()=>fail("Server terlalu lama merespons. "+getConnectionHint()),API_TIMEOUT_MS);
+        window[callbackName]=data=>{
+          if(finished)return;
+          finished=true;cleanup();
+          if(data&&typeof data==="object")resolve(data);
+          else reject(new Error("Respons server CBT tidak valid."));
+        };
+        script.onerror=()=>fail("Gagal memuat server CBT. "+getConnectionHint());
+        script.src=endpoint+(endpoint.includes("?")?"&":"?")+params.toString();
+        document.head.appendChild(script);
+      });
+    }
+    async function apiOnce(action,payload={},attempt=0){
+      try{
+        // Jalur utama: respons JSON langsung lebih stabil pada Chrome Android/iOS.
+        return await apiJson(action,payload);
+      }catch(fetchError){
+        // Cadangan: tetap dukung JSONP untuk browser lama atau jaringan tertentu.
+        return await apiJsonp(action,payload);
+      }
+    }
+    async function api(action,payload={}){
+      let lastError;
+      for(let attempt=0;attempt<=API_RETRIES;attempt++){
+        try{return await apiOnce(action,payload,attempt);}
+        catch(err){
+          lastError=err;
+          if(attempt<API_RETRIES)await new Promise(resolve=>setTimeout(resolve,700*(attempt+1)));
+        }
+      }
+      throw lastError||new Error("Gagal menghubungi server CBT.");
     }
 
-}
-
-
-/* =========================================================
-   MULAI UJIAN
-========================================================= */
-
-function mintaLayarPenuh() {
-
-    // Browser hanya mengizinkan fullscreen setelah tindakan pengguna.
-    // Pemanggilan dilakukan dari klik tombol Mulai Ujian.
-    if (document.fullscreenElement) {
-        return;
-    }
-
-    const elemenHalaman = document.documentElement;
-    const requestFullscreen =
-        elemenHalaman.requestFullscreen ||
-        elemenHalaman.webkitRequestFullscreen;
-
-    if (requestFullscreen) {
-        try {
-            const hasil = requestFullscreen.call(elemenHalaman);
-            if (hasil && typeof hasil.catch === "function") {
-                hasil.catch(error => {
-                    console.warn("Fullscreen tidak dapat diaktifkan:", error);
-                });
-            }
-        } catch (error) {
-            console.warn("Fullscreen tidak didukung atau ditolak browser:", error);
-        }
-    } else {
-        console.warn("Fullscreen API tidak didukung browser ini.");
-    }
-
-}
-
-function mulaiUjian() {
-
-    mintaLayarPenuh();
-
-    indeksSekarang = 0;
-
-    jawabanSiswa = {};
-
-    buatNavigasiNomorCbt();
-
-    tampilkanSoal();
-
-    pindahKe("sec-soal");
-
-}
-
-
-/* =========================================================
-   NAVIGASI NOMOR
-========================================================= */
-
-function buatNavigasiNomorCbt() {
-
-    const gridContainer =
-        document.getElementById(
-            "gridNomorCbt"
-        );
-
-
-    gridContainer.innerHTML = "";
-
-
-    masterSoal.forEach(
-        (soal, idx) => {
-
-            const btn =
-                document.createElement(
-                    "button"
-                );
-
-
-            btn.id =
-                `btn-nav-no-${idx}`;
-
-            btn.className =
-                "btn-nomor";
-
-            btn.innerText =
-                idx + 1;
-
-
-            btn.onclick = () => {
-
-                indeksSekarang =
-                    idx;
-
-                tampilkanSoal();
-
-            };
-
-
-            /* FIX:
-               sebelumnya appendChild dilakukan dua kali */
-
-            gridContainer.appendChild(btn);
-
-        }
-    );
-
-}
-
-
-function perbaruiStatusNavigasiNomor() {
-
-    masterSoal.forEach(
-        (soal, idx) => {
-
-            const btn =
-                document.getElementById(
-                    `btn-nav-no-${idx}`
-                );
-
-
-            if (btn) {
-
-                btn.classList.toggle(
-                    "answered",
-                    jawabanSiswa[idx] !== undefined
-                );
-
-
-                btn.classList.toggle(
-                    "active",
-                    idx === indeksSekarang
-                );
-
-            }
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   REMIDI TP
-========================================================= */
-
-function mulaiRemidiPerTP(kodeTP) {
-
-    const soalRemidi =
-        backupMasterSoal.filter(
-            s => {
-
-                const noSoal =
-                    parseInt(s.no);
-
-
-                if (kodeTP === "TP1") {
-
-                    return (
-                        noSoal >= 1 &&
-                        noSoal <= 10
-                    );
-
-                }
-
-
-                if (kodeTP === "TP2") {
-
-                    return (
-                        noSoal >= 11 &&
-                        noSoal <= 20
-                    );
-
-                }
-
-
-                return false;
-
-            }
-        );
-
-
-    if (
-        soalRemidi.length === 0
-    ) {
-
-        showModal({
-            type: "warning",
-            title: "Kosong",
-            text:
-            "Tidak ada kumpulan data soal remedial untuk kelompok materi ini."
+    async function loadClasses(){
+      const select=$("kelas");
+      select.disabled=true;
+      select.innerHTML='<option value="">Memuat daftar kelas...</option>';
+      try{
+        const data=await api("getClasses");
+        if(!data.success) throw new Error(data.message||"Gagal memuat kelas.");
+        const classes=Array.isArray(data.classes)?data.classes:[];
+        select.innerHTML='<option value="">-- Pilih Kelas --</option>';
+        classes.forEach(kelas=>{
+          const option=document.createElement("option");
+          option.value=kelas; option.textContent=kelas;
+          select.appendChild(option);
         });
-
-        return;
-
+        if(!classes.length){
+          select.innerHTML='<option value="">Belum ada data kelas</option>';
+        }
+      }catch(err){
+        select.innerHTML='<option value="">Gagal memuat kelas</option>';
+        setMessage("loginMessage",err.message||"Gagal mengambil daftar kelas dari server.");
+      }finally{
+        select.disabled=false;
+      }
     }
 
-
-    showModal({
-
-        type: "warning",
-
-        title: "Konfirmasi Ulang",
-
-        text:
-        `Sebelum remedial dimulai, sistem akan membersihkan data sementara pengerjaan lama dari browser. Data nilai yang sudah tersimpan di server TIDAK akan dihapus. Lanjutkan remedial ${kodeTP}?`,
-
-        confirmText:
-            "Bersihkan & Mulai",
-
-        cancelText:
-            "Batal",
-
-        onConfirm: () => {
-            sessionStorage.setItem(
-                "simpatik_remedial_pending",
-                kodeTP
-            );
-
-            jalankanPembersihanRemedial(kodeTP);
+    async function loadStudentsByClass(kelas){
+      const select=$("username");
+      select.disabled=true;
+      select.innerHTML='<option value="">Memuat daftar siswa...</option>';
+      if(!kelas){
+        select.innerHTML='<option value="">Pilih kelas terlebih dahulu</option>';
+        return;
+      }
+      try{
+        const data=await api("getStudents",{kelas});
+        if(!data.success) throw new Error(data.message||"Gagal memuat daftar siswa.");
+        const students=Array.isArray(data.students)?data.students:[];
+        select.innerHTML='<option value="">-- Pilih Nama Siswa --</option>';
+        students.forEach(student=>{
+          const option=document.createElement("option");
+          option.value=student.username;
+          option.textContent=student.nama || student.username;
+          option.dataset.nama=student.nama||"";
+          select.appendChild(option);
+        });
+        if(!students.length){
+          select.innerHTML='<option value="">Tidak ada siswa pada kelas ini</option>';
         }
+      }catch(err){
+        select.innerHTML='<option value="">Gagal memuat siswa</option>';
+        setMessage("loginMessage",err.message||"Gagal mengambil daftar siswa.");
+      }finally{
+        select.disabled=false;
+      }
+    }
 
+    async function showScheduleDialog(){
+      const dialog=$("scheduleDialog");
+      const status=$("scheduleStatus");
+      const rows=$("scheduleRows");
+      rows.replaceChildren();
+      status.className="schedule-message";
+      status.textContent="Memuat jadwal...";
+      if(!dialog.open)dialog.showModal();
+      try{
+        const data=await api("getSchedules");
+        if(!data.success)throw new Error(data.message||"Jadwal gagal dimuat.");
+        const schedules=Array.isArray(data.schedules)?data.schedules:[];
+        if(!schedules.length){status.textContent="Belum ada jadwal aktif pada spreadsheet.";return;}
+        status.textContent="Menampilkan "+schedules.length+" jadwal aktif.";
+        schedules.forEach(schedule=>{
+          const tr=document.createElement("tr");
+          [schedule.tanggal,schedule.kelas,schedule.mapel,schedule.mulai,schedule.selesai].forEach((value,index)=>{
+            const td=document.createElement("td");
+            td.textContent=index>=3?formatTimeValue(value):formatValue(value);
+            if(index>=3)td.className="schedule-time";
+            tr.appendChild(td);
+          });
+          rows.appendChild(tr);
+        });
+      }catch(err){
+        status.className="schedule-message error";
+        status.textContent=err.message||"Gagal memuat jadwal. Periksa koneksi dan deployment Apps Script.";
+      }
+    }
+
+    // GAS mengembalikan jadwal sebagai {tanggal, kelas, mapel, mulai, selesai}.
+    // Pada sheet JADWAL, mulai berada di kolom E dan selesai di kolom F.
+    function normalizeJadwal(value){
+      const source=value||{};
+      return {
+        ...source,
+        idJadwal:source.idJadwal??source.ID_JADWAL??"",
+        tanggal:source.tanggal??source.TANGGAL??source.tanggalUjian??"",
+        kelas:source.kelas??source.KELAS??"",
+        mapel:source.mapel??source.MAPEL??"",
+        mulai:source.mulai??source.MULAI??source.waktuMulai??source["WAKTU MULAI"]??"",
+        selesai:source.selesai??source.SELESAI??source.waktuSelesai??source["WAKTU SELESAI"]??""
+      };
+    }
+    function normalizeScheduleError(message){
+      const text=String(message||"");
+      if(/format jam|1899|1900|waktu ujian sudah berakhir/i.test(text)){
+        return formatServerMessage(text)+" Pastikan kolom E = MULAI dan kolom F = SELESAI pada sheet JADWAL.";
+      }
+      return text;
+    }
+
+    function saveState(){
+      localStorage.setItem("cbt_session_id",state.sessionId);
+      localStorage.setItem("cbt_state",JSON.stringify({user:state.user,jadwal:state.jadwal,googleFormUrl:state.googleFormUrl,examActive:state.examActive}));
+    }
+    function resetState(){
+      state.sessionId="";state.user=null;state.jadwal=null;state.googleFormUrl="";state.examActive=false;stopExamTimer();
+      stopViolationCountdown();
+      try{localStorage.removeItem(CONFIG.VIOLATION_STORAGE_KEY);}catch(e){}
+      $("violationOverlay").classList.remove("active");stopWarningSound();
+      localStorage.removeItem("cbt_session_id");localStorage.removeItem("cbt_state");
+    }
+    function restoreState(){
+      const sid=localStorage.getItem("cbt_session_id"); if(!sid)return;
+      state.sessionId=sid;
+      try{
+        const x=JSON.parse(localStorage.getItem("cbt_state")||"{}");
+        state.user=x.user||null;
+        state.jadwal=x.jadwal?normalizeJadwal(x.jadwal):null;
+        state.googleFormUrl=x.googleFormUrl||"";
+        state.examActive=x.examActive===true;
+      }catch(e){}
+      // Pulihkan tampilan dari penyimpanan lokal seketika; jangan biarkan layar login
+      // menjadi tampilan sementara selama checkSession masih menunggu jaringan.
+      if(state.user&&state.jadwal){
+        if(state.examActive){showRunningScreen();openGoogleForm();}
+        else showExamScreen();
+      }
+      checkExistingSession();
+    }
+
+    function showSessionRestoreNotice(message){
+      const notice=$("sessionRestoreNotice");
+      if(!notice)return;
+      notice.textContent=message;
+      notice.className="notice";
+      notice.style.display="block";
+    }
+    async function checkExistingSession(){
+      const hasLocalSession=Boolean(state.user&&state.jadwal);
+      try{
+        const data=await api("checkSession",{sessionId:state.sessionId});
+        if(data&&data.valid){
+          if(data.status==="submit_form"){
+            state.examActive=false;saveState();closeGoogleForm();showQuestionnaire();
+          }else if(state.user&&state.jadwal){
+            // Hanya status server "mengerjakan" yang mengaktifkan ulang flag ujian.
+            // Status/response lain tidak menghapus pemulihan lokal secara otomatis.
+            if(data.status==="mengerjakan")state.examActive=true;
+            saveState();
+            if(state.examActive){
+              showRunningScreen();
+              if(!$("googleFormOverlay").classList.contains("active"))openGoogleForm();
+            }else showExamScreen();
+            $("sessionRestoreNotice").style.display="none";
+          }else{
+            showSessionRestoreNotice("Server mengonfirmasi sesi, tetapi data peserta lokal tidak lengkap. Muat ulang setelah koneksi pulih atau hubungi pengawas.");
+          }
+        }else if(hasLocalSession){
+          // Pertahankan ujian yang sedang berjalan untuk menghindari logout akibat
+          // respons checkSession yang kosong/tidak sinkron; proses ujian dapat melapor
+          // kembali ke server saat jaringan tersedia.
+          showSessionRestoreNotice("Lembar Soal dipulihkan dari perangkat ini. Status server belum terkonfirmasi; periksa koneksi dan beri tahu pengawas jika terjadi kendala.");
+        }else resetState();
+      }catch(e){
+        if(hasLocalSession){
+          showSessionRestoreNotice("Lembar Soal dipulihkan dari perangkat ini, tetapi server belum dapat dihubungi. Periksa koneksi internet.");
+        }
+        // Jika sesi lokal ada, tetap tampilkan layar yang dipulihkan; jangan kembali ke login.
+      }
+    }
+
+    function showExamScreen(){
+      $("examName").textContent=formatValue(state.user?.nama);
+      $("examClass").textContent="Kelas "+formatValue(state.user?.kelas);
+      $("examMapel").textContent=formatValue(state.jadwal?.mapel);
+      $("sumKelas").textContent=formatValue(state.jadwal?.kelas);
+      $("sumMapel").textContent=formatValue(state.jadwal?.mapel);
+      $("sumMulai").textContent=formatTimeValue(state.jadwal?.mulai);
+      $("sumSelesai").textContent=formatTimeValue(state.jadwal?.selesai);
+      showScreen("examScreen");
+    }
+    function showRunningScreen(){
+      $("runningMapel").textContent=formatValue(state.jadwal?.mapel);
+      $("runningName").textContent=formatValue(state.user?.nama);
+      $("runningClass").textContent=formatValue(state.user?.kelas);
+      $("runningStart").textContent=formatTimeValue(state.jadwal?.mulai);
+      $("runningEnd").textContent=formatTimeValue(state.jadwal?.selesai);
+      showScreen("runningScreen");
+      if(state.examActive)startExamTimer();
+    }
+    function getJakartaParts(date){
+      const parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Jakarta",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(date);
+      return Object.fromEntries(parts.filter(p=>p.type!=="literal").map(p=>[p.type,p.value]));
+    }
+    function getExamDeadline(){
+      const dateParts=parseDateParts(state.jadwal?.tanggal);
+      const timeParts=parseTimeParts(state.jadwal?.selesai);
+      if(!dateParts||!timeParts)return null;
+      // Jadwal dibuat dalam WIB; ubah WIB ke epoch UTC secara eksplisit.
+      return Date.UTC(dateParts.year,dateParts.month-1,dateParts.day,timeParts.hour,timeParts.minute)-7*60*60*1000;
+    }
+    function updateExamTimer(){
+      const deadline=getExamDeadline();
+      if(deadline===null){$("examTimer").textContent="--:--:--";return;}
+      const remaining=Math.max(0,Math.floor((deadline-Date.now())/1000));
+      const hours=String(Math.floor(remaining/3600)).padStart(2,"0");
+      const minutes=String(Math.floor((remaining%3600)/60)).padStart(2,"0");
+      const seconds=String(remaining%60).padStart(2,"0");
+      $("examTimer").textContent=hours+":"+minutes+":"+seconds;
+    }
+    function startExamTimer(){
+      stopExamTimer();updateExamTimer();
+      state.examTimerId=setInterval(updateExamTimer,1000);
+    }
+    function stopExamTimer(){
+      if(state.examTimerId){clearInterval(state.examTimerId);state.examTimerId=null;}
+      const timer=$("examTimer");if(timer)timer.textContent="--:--:--";
+    }
+    function showQuestionnaire(){
+      $("questionMessage").textContent="Berikan penilaian setelah menyelesaikan CBT.";
+      $("questionMessage").className="notice";
+      showScreen("questionnaireScreen");
+    }
+    function makeEmbeddedFormUrl(url){
+      try{
+        const formUrl=new URL(url);
+        formUrl.searchParams.set("embedded","true");
+        return formUrl.toString();
+      }catch(e){return url;}
+    }
+    function makeStandaloneFormUrl(url){
+      try{
+        const formUrl=new URL(url);
+        // Mode halaman penuh dipakai di HP/tablet agar CSS Google Forms dimuat normal.
+        formUrl.searchParams.delete("embedded");
+        return formUrl.toString();
+      }catch(e){return url;}
+    }
+    function isMobileFormDevice(){
+      return window.matchMedia("(max-width:700px)").matches || /Android|iPhone|iPad|iPod|Mobile|Tablet/i.test(navigator.userAgent);
+    }
+    function openGoogleForm(){
+      const url=state.googleFormUrl||CONFIG.DEFAULT_GOOGLE_FORM_URL;
+      if(!url){alert("Link Google Form belum tersedia.");return;}
+      saveState();
+      // Form tetap di dalam halaman CBT pada desktop maupun ponsel agar perubahan
+      // tab dapat diawasi. Google Form mendukung parameter embedded=true.
+      $("embeddedFormTitle").textContent="Ujian CBT • "+formatValue(state.jadwal?.mapel);
+      $("embeddedStudentName").textContent=formatValue(state.user?.nama)+" • Kelas "+formatValue(state.user?.kelas);
+      $("googleFormFrame").src=makeEmbeddedFormUrl(url);
+      $("googleFormOverlay").classList.add("active");
+      $("googleFormOverlay").setAttribute("aria-hidden","false");
+      const savedViolation=getSavedViolation();
+      if(savedViolation?.locked)showViolationLock(savedViolation);
+    }
+    function closeGoogleForm(){
+      $("googleFormOverlay").classList.remove("active");
+      $("googleFormOverlay").setAttribute("aria-hidden","true");
+    }
+    function getSavedViolation(){
+      try{return JSON.parse(localStorage.getItem(CONFIG.VIOLATION_STORAGE_KEY)||"null");}catch(e){return null;}
+    }
+    function isExamSheetOpen(){
+      return state.examActive && $("googleFormOverlay").classList.contains("active");
+    }
+    function stopViolationCountdown(){
+      if(violationCountdownId){clearInterval(violationCountdownId);violationCountdownId=null;}
+    }
+    function clearViolationLock(){
+      stopViolationCountdown();
+      try{localStorage.removeItem(CONFIG.VIOLATION_STORAGE_KEY);}catch(e){}
+      $("violationOverlay").classList.remove("active");
+      stopWarningSound();
+      if(state.examActive)updateExamTimer();
+    }
+    function startViolationCountdown(expiresAt){
+      stopViolationCountdown();
+      const tick=()=>{
+        const remaining=Math.max(0,Number(expiresAt)-Date.now());
+        const seconds=Math.ceil(remaining/1000);
+        const minutes=String(Math.floor(seconds/60)).padStart(2,"0");
+        const rest=String(seconds%60).padStart(2,"0");
+        $("violationCountdown").textContent="Halaman ujian terbuka otomatis dalam "+minutes+":"+rest;
+        if(remaining<=0)clearViolationLock();
+      };
+      tick();
+      if($("violationOverlay").classList.contains("active"))violationCountdownId=setInterval(tick,250);
+    }
+    function showViolationLock(record){
+      if(!record||!record.locked)return;
+      let expiresAt=Number(record.expiresAt);
+      // Migrasi lock versi lama yang belum menyimpan waktu kedaluwarsa.
+      if(!Number.isFinite(expiresAt)||expiresAt<=0){
+        expiresAt=Date.now()+CONFIG.VIOLATION_DURATION_MS;
+        record={...record,expiresAt};
+        try{localStorage.setItem(CONFIG.VIOLATION_STORAGE_KEY,JSON.stringify(record));}catch(e){}
+      }
+      if(expiresAt<=Date.now()){clearViolationLock();return;}
+      const count=Math.max(1,Number(record.count)||1);
+      $("violationCount").textContent="Pelanggaran "+count;
+      $("adminPinError").textContent="";
+      $("violationOverlay").classList.add("active");
+      $("adminPinInput").value="";
+      startViolationCountdown(expiresAt);
+      startWarningSound();
+    }
+    function recordExamViolation(reason){
+      if(!isExamSheetOpen())return;
+      const existing=getSavedViolation();
+      // Jangan memperpanjang atau menggandakan lock untuk satu perpindahan tab.
+      if(existing?.locked&&Number(existing.expiresAt)>Date.now()){
+        showViolationLock(existing);
+        return;
+      }
+      const record={
+        locked:true,
+        count:(Number(existing?.count)||0)+1,
+        reason:reason||"Meninggalkan halaman ujian",
+        time:new Date().toISOString(),
+        expiresAt:Date.now()+CONFIG.VIOLATION_DURATION_MS
+      };
+      try{localStorage.setItem(CONFIG.VIOLATION_STORAGE_KEY,JSON.stringify(record));}catch(e){}
+      showViolationLock(record);
+    }
+    function restoreViolationLock(){
+      const record=getSavedViolation();
+      if(record&&record.locked&&isExamSheetOpen())showViolationLock(record);
+      else if(record&&Number(record.expiresAt)>0&&Number(record.expiresAt)<=Date.now())clearViolationLock();
+    }
+    $("adminPinForm").addEventListener("submit",e=>{
+      e.preventDefault();
+      const pin=$("adminPinInput").value.trim();
+      if(pin!==CONFIG.ADMIN_PIN){$("adminPinError").textContent="PIN Admin salah. Peringatan tetap terkunci.";$("adminPinInput").select();return;}
+      clearViolationLock();
+      $("adminPinError").textContent="";
+    });
+    async function recordFormSubmission(button){
+      setButtonLoading(button,true,"Mencatat...");
+      try{
+        const data=await api("submitForm",{sessionId:state.sessionId,ip:"",device:getDevice()});
+        if(!data.success){alert(data.message||"Pengerjaan belum dapat dicatat.");return;}
+        state.examActive=false;saveState();stopExamTimer();
+        closeGoogleForm();
+        showQuestionnaire();
+      }catch(err){alert(err.message||"Gagal mencatat pengerjaan.");}
+      finally{setButtonLoading(button,false,button.id==="embeddedSubmitButton"?"Sudah kirim":"Sudah Kirim Jawaban");}
+    }
+
+    $("togglePassword").addEventListener("click",()=>{const i=$("password");i.type=i.type==="password"?"text":"password";});
+    $("showPassword").addEventListener("change",e=>{$("password").type=e.target.checked?"text":"password";});
+
+    $("kelas").addEventListener("change",async e=>{
+      hideMessage("loginMessage");
+      $("password").value="";
+      $("token").value="";
+      await loadStudentsByClass(e.target.value);
     });
 
-}
+    function formatServerMessage(message){
+      const raw=String(message||"");
+      const ended=raw.match(/waktu ujian sudah berakhir pada pukul\s+(.+)\.?$/i);
+      if(ended){
+        const time=parseTimeParts(ended[1]);
+        if(time)return "Waktu ujian sudah berakhir pada pukul "+String(time.hour).padStart(2,"0")+":"+String(time.minute).padStart(2,"0")+" WIB.";
+      }
+      if(/1899|1900|31 Dec 1899|Sun Dec 31 1899/i.test(raw)){
+        return "Server mengirim waktu ujian dalam format tanggal dasar Google Sheets. Jam yang terbaca: "+formatTimeValue(raw)+" WIB. Jika seharusnya jam berbeda (misalnya 23:37), perbaiki nilai kolom SELESAI di sheet JADWAL.";
+      }
+      return raw;
+    }
 
-
-/* =========================================================
-   BERSIHKAN DATA REMEDIAL
-
-   Catatan:
-   JavaScript tidak diizinkan Chrome menghapus seluruh HTTP cache
-   browser. Fungsi ini membersihkan data aplikasi yang berada di
-   storage/cache yang dapat dikendalikan oleh halaman, tanpa menghapus
-   sesi login siswa atau data nilai di server.
-========================================================= */
-async function bersihkanDataRemedial(kodeTP = null) {
-
-    try {
-        if (!kodeTP) {
-            const statusTP = dataSiswa.status_tp || {};
-            kodeTP = statusTP.tp1 !== "TUNTAS"
-                ? "TP1"
-                : statusTP.tp2 !== "TUNTAS"
-                    ? "TP2"
-                    : null;
+    $("loginForm").addEventListener("submit",async e=>{
+      e.preventDefault();hideMessage("loginMessage");
+      const kelas=$("kelas").value.trim(),username=$("username").value.trim(),password=$("password").value,token=$("token").value.trim();
+      if(!kelas||!username||!password||!token){setMessage("loginMessage","Kelas, username, password, dan token wajib diisi.");return;}
+      const button=$("loginButton");setButtonLoading(button,true,"Memverifikasi...");
+      try{
+        const data=await api("login",{username,password,token,kelas,ip:"",device:getDevice()});
+        if(!data.success){
+          setMessage("loginMessage",normalizeScheduleError(data.message||"Login gagal."));
+          return;
         }
-
-        if (!kodeTP) {
-            showModal({
-                type: "success",
-                title: "Semua TP Tuntas",
-                text: "Tidak ada remedial yang perlu dijalankan."
-            });
-            return;
-        }
-
-        showModal({
-            type: "warning",
-            title: "Bersihkan Data Remedial?",
-            text: `Data sementara pengerjaan lama akan dibersihkan. Data nilai yang sudah tersimpan di server tetap aman. Setelah itu remedial ${kodeTP} akan dimulai.`,
-            confirmText: "Ya, Bersihkan",
-            cancelText: "Batal",
-            onConfirm: () => {
-                sessionStorage.setItem("simpatik_remedial_pending", kodeTP);
-                jalankanPembersihanRemedial(kodeTP);
-            }
-        });
-
-    } catch (error) {
-        console.error("Persiapan remedial gagal:", error);
-    }
-}
-
-async function jalankanPembersihanRemedial(kodeTP) {
-
-    try {
-        // Bersihkan data sementara aplikasi pada sessionStorage.
-        const sessionKeys = [];
-        for (let i = 0; i < sessionStorage.length; i++) {
-            sessionKeys.push(sessionStorage.key(i));
-        }
-
-        sessionKeys.forEach(key => {
-            if (key && (
-                key.toLowerCase().includes("jawab") ||
-                key.toLowerCase().includes("soal") ||
-                key.toLowerCase().includes("ujian") ||
-                key.toLowerCase().includes("remed") ||
-                key.toLowerCase().includes("pengerjaan") ||
-                key.toLowerCase().includes("simpatik")
-            )) {
-                // Jangan hapus flag remedial yang baru dibuat.
-                if (key !== "simpatik_remedial_pending") {
-                    sessionStorage.removeItem(key);
-                }
-            }
-        });
-
-        // Hapus cache yang dikelola Cache Storage/API (jika ada).
-        if ("caches" in window) {
-            const cacheNames = await caches.keys();
-            await Promise.all(
-                cacheNames.map(name => caches.delete(name))
-            );
-        }
-
-        // Reset seluruh state ujian yang sedang berada di memori.
-        jawabanSiswa = {};
-        indeksSekarang = 0;
-        masterSoal = [];
-        backupMasterSoal = [];
-
-        /*
-         * Jangan menghapus localStorage "sesi_siswa" karena siswa masih
-         * harus tetap login. Nilai dan histori di Google Sheets juga aman.
-         */
-
-        if (kodeTP) {
-            sessionStorage.setItem(
-                "simpatik_remedial_pending",
-                kodeTP
-            );
-        }
-
-        // Muat ulang halaman dengan parameter unik untuk menghindari
-        // penggunaan dokumen HTML lama dari cache browser.
-        const url = new URL(window.location.href);
-        url.searchParams.set("remedial_reset", Date.now().toString());
-
-        window.location.replace(url.toString());
-
-    } catch (error) {
-        console.error("Pembersihan data remedial gagal:", error);
-
-        showModal({
-            type: "error",
-            title: "Gagal Menyiapkan Remedial",
-            text: "Data sementara tidak berhasil dibersihkan. Silakan muat ulang halaman lalu coba kembali."
-        });
-    }
-}
-
-
-/* =========================================================
-   TAMPILKAN SOAL
-========================================================= */
-
-function tampilkanSoal() {
-
-    const soal =
-        masterSoal[indeksSekarang];
-
-
-    document.getElementById(
-        "info-progres"
-    ).innerText =
-        `Soal ${indeksSekarang + 1}
-         dari ${masterSoal.length}`;
-
-
-    document.getElementById(
-        "konten-soal"
-    ).innerHTML =
-        `<strong>
-            Soal No. ${indeksSekarang + 1}:
-         </strong>
-         <br>
-         ${soal.pertanyaan}`;
-
-
-    const imgEl =
-        document.getElementById(
-            "gambar-soal"
-        );
-
-
-    if (
-        soal.gambar &&
-        soal.gambar.trim() !== ""
-    ) {
-
-        imgEl.src =
-            soal.gambar.trim();
-
-        imgEl.style.display =
-            "block";
-
-    }
-    else {
-
-        imgEl.src = "";
-
-        imgEl.style.display =
-            "none";
-
-    }
-
-
-    const opsiContainer =
-        document.getElementById(
-            "konten-opsi"
-        );
-
-
-    opsiContainer.innerHTML = "";
-
-
-    const hurufOpsi =
-        ["A", "B", "C", "D", "E"];
-
-
-    hurufOpsi.forEach(
-        h => {
-
-            const teksOpsi =
-                soal[h.toLowerCase()];
-
-
-            if (
-                teksOpsi &&
-                teksOpsi.toString().trim() !== ""
-            ) {
-
-                const label =
-                    document.createElement(
-                        "label"
-                    );
-
-
-                label.className =
-                    `opsi ${
-                        jawabanSiswa[indeksSekarang] === h
-                        ? "selected"
-                        : ""
-                    }`;
-
-
-                label.innerHTML =
-                `
-                <input
-                    type="radio"
-                    name="opsiCbt"
-                    value="${h}"
-                    ${
-                        jawabanSiswa[indeksSekarang] === h
-                        ? "checked"
-                        : ""
-                    }
-                >
-
-                <span>
-                    ${h}. ${teksOpsi}
-                </span>
-                `;
-
-
-                label.addEventListener(
-                    "click",
-                    () => {
-
-                        document
-                            .querySelectorAll(
-                                ".opsi"
-                            )
-                            .forEach(
-                                o =>
-                                o.classList.remove(
-                                    "selected"
-                                )
-                            );
-
-
-                        label.classList.add(
-                            "selected"
-                        );
-
-
-                        jawabanSiswa[
-                            indeksSekarang
-                        ] = h;
-
-
-                        perbaruiStatusNavigasiNomor();
-
-                    }
-                );
-
-
-                opsiContainer.appendChild(
-                    label
-                );
-
-            }
-
-        }
-    );
-
-
-    document.getElementById(
-        "btnPrev"
-    ).disabled =
-        indeksSekarang === 0;
-
-
-    const btnNext =
-        document.getElementById(
-            "btnNext"
-        );
-
-
-    if (
-        indeksSekarang ===
-        masterSoal.length - 1
-    ) {
-
-        btnNext.innerHTML =
-        `
-        <i class="fa-solid fa-floppy-disk"></i>
-        SELESAI
-        `;
-
-        btnNext.className =
-            "btn btn-success";
-
-    }
-    else {
-
-        btnNext.innerHTML =
-        `
-        Selanjutnya
-        <i class="fa-solid fa-chevron-right"></i>
-        `;
-
-        btnNext.className =
-            "btn";
-
-    }
-
-
-    perbaruiStatusNavigasiNomor();
-
-}
-
-
-function soalSebelumnya() {
-
-    if (
-        indeksSekarang > 0
-    ) {
-
-        indeksSekarang--;
-
-        tampilkanSoal();
-
-    }
-
-}
-
-
-function soalBerikutnya() {
-
-    if (
-        indeksSekarang <
-        masterSoal.length - 1
-    ) {
-
-        indeksSekarang++;
-
-        tampilkanSoal();
-
-    }
-    else {
-
-        showModal({
-
-            type: "warning",
-
-            title: "Selesai Ujian?",
-
-            text:
-            "Apakah Anda yakin seluruh lembar jawaban sudah terisi dan ingin mengirimkannya?",
-
-            confirmText:
-                "Ya, Kirim",
-
-            cancelText:
-                "Periksa Lagi",
-
-            onConfirm:
-                () =>
-                hitungDanSelesaiUjian()
-
-        });
-
-    }
-
-}
-
-
-/* =========================================================
-   HITUNG DAN SUBMIT UJIAN
-========================================================= */
-
-async function hitungDanSelesaiUjian() {
-
-    const btnNext =
-        document.getElementById(
-            "btnNext"
-        );
-
-
-    btnNext.disabled = true;
-
-    btnNext.innerHTML =
-    `
-    <i class="fa-solid fa-spinner fa-spin"></i>
-    Menyimpan...
-    `;
-
-
-    let skorMaksTP1 = 0;
-    let skorSiswaTP1 = 0;
-
-    let skorMaksTP2 = 0;
-    let skorSiswaTP2 = 0;
-
-    let totalSkorSiswa = 0;
-    let totalSkorMaksimal = 0;
-
-
-    masterSoal.forEach(
-        (soal, indeks) => {
-
-            const noSoal =
-                parseInt(soal.no);
-
-            const bobotSkor =
-                parseInt(soal.skor) || 10;
-
-
-            const isBenar =
-                jawabanSiswa[indeks] ===
-                soal.kunci;
-
-
-            totalSkorMaksimal +=
-                bobotSkor;
-
-
-            if (isBenar) {
-
-                totalSkorSiswa +=
-                    bobotSkor;
-
-            }
-
-
-            if (
-                noSoal >= 1 &&
-                noSoal <= 10
-            ) {
-
-                skorMaksTP1 +=
-                    bobotSkor;
-
-                if (isBenar) {
-
-                    skorSiswaTP1 +=
-                        bobotSkor;
-
-                }
-
-            }
-            else if (
-                noSoal >= 11 &&
-                noSoal <= 20
-            ) {
-
-                skorMaksTP2 +=
-                    bobotSkor;
-
-                if (isBenar) {
-
-                    skorSiswaTP2 +=
-                        bobotSkor;
-
-                }
-
-            }
-
-        }
-    );
-
-
-    const skorAkhir =
-        totalSkorMaksimal > 0
-        ? Math.round(
-            (
-                totalSkorSiswa /
-                totalSkorMaksimal
-            ) * 100
-        )
-        : 0;
-
-
-    const persenTP1 =
-        skorMaksTP1 > 0
-        ? Math.round(
-            (
-                skorSiswaTP1 /
-                skorMaksTP1
-            ) * 100
-        )
-        : 0;
-
-
-    const persenTP2 =
-        skorMaksTP2 > 0
-        ? Math.round(
-            (
-                skorSiswaTP2 /
-                skorMaksTP2
-            ) * 100
-        )
-        : 0;
-
-
-    document.getElementById(
-        "txtSkor"
-    ).innerText =
-        skorAkhir;
-
-
-    const containerTP =
-        document.getElementById(
-            "analisis-tp-container"
-        );
-
-
-    containerTP.innerHTML = "";
-
-
-    let tp1Tuntas = true;
-    let tp2Tuntas = true;
-
-
-    if (
-        skorMaksTP1 > 0
-    ) {
-
-        const btn1 =
-            document.createElement(
-                "button"
-            );
-
-        btn1.className =
-            "btn-tp";
-
-
-        if (
-            persenTP1 >= kkmServer
-        ) {
-
-            btn1.style.backgroundColor =
-                "var(--tuntas)";
-
-            btn1.innerHTML =
-            `
-            <i class="fa-solid fa-circle-check"></i>
-            TP 1: ${persenTP1} (Tuntas)
-            `;
-
-        }
-        else {
-
-            btn1.style.backgroundColor =
-                "var(--belum-tuntas)";
-
-            btn1.classList.add(
-                "remedi-clickable"
-            );
-
-            btn1.innerHTML =
-            `
-            <i class="fa-solid fa-triangle-exclamation"></i>
-            TP 1: ${persenTP1} (Remidi)
-            `;
-
-
-            btn1.onclick =
-                () =>
-                mulaiRemidiPerTP("TP1");
-
-
-            tp1Tuntas = false;
-
-        }
-
-
-        containerTP.appendChild(
-            btn1
-        );
-
-    }
-
-
-    if (
-        skorMaksTP2 > 0
-    ) {
-
-        const btn2 =
-            document.createElement(
-                "button"
-            );
-
-        btn2.className =
-            "btn-tp";
-
-
-        if (
-            persenTP2 >= kkmServer
-        ) {
-
-            btn2.style.backgroundColor =
-                "var(--tuntas)";
-
-            btn2.innerHTML =
-            `
-            <i class="fa-solid fa-circle-check"></i>
-            TP 2: ${persenTP2} (Tuntas)
-            `;
-
-        }
-        else {
-
-            btn2.style.backgroundColor =
-                "var(--belum-tuntas)";
-
-            btn2.classList.add(
-                "remedi-clickable"
-            );
-
-            btn2.innerHTML =
-            `
-            <i class="fa-solid fa-triangle-exclamation"></i>
-            TP 2: ${persenTP2} (Remidi)
-            `;
-
-
-            btn2.onclick =
-                () =>
-                mulaiRemidiPerTP("TP2");
-
-
-            tp2Tuntas = false;
-
-        }
-
-
-        containerTP.appendChild(
-            btn2
-        );
-
-    }
-
-
-    const btnPindahKuesioner =
-        document.getElementById(
-            "btnPindahKuesioner"
-        );
-
-
-    const btnBersihkanRemedial =
-        document.getElementById("btnBersihkanRemedial");
-
-    const remedialClearArea =
-        document.getElementById("remedial-clear-area");
-
-    if (
-        tp1Tuntas &&
-        tp2Tuntas
-    ) {
-
-        btnPindahKuesioner.style.display =
-            "flex";
-
-        if (btnBersihkanRemedial) {
-            btnBersihkanRemedial.style.display = "none";
-        }
-
-        if (remedialClearArea) {
-            remedialClearArea.style.display = "none";
-        }
-
-    }
-    else {
-
-        btnPindahKuesioner.style.display =
-            "none";
-
-        if (btnBersihkanRemedial) {
-            btnBersihkanRemedial.style.display = "none";
-        }
-
-        if (remedialClearArea) {
-            remedialClearArea.style.display = "block";
-        }
-
-    }
-
-
-    let jawabanFormatGAS = {};
-
-
-    masterSoal.forEach(
-        (soal, indeks) => {
-
-            if (
-                jawabanSiswa[indeks] !==
-                undefined
-            ) {
-
-                jawabanFormatGAS[
-                    soal.no
-                ] =
-                    jawabanSiswa[indeks];
-
-            }
-
-        }
-    );
-
-
-    try {
-
-        const response =
-            await fetch(
-                SCRIPT_URL,
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                        "text/plain;charset=utf-8"
-                    },
-
-                    body:
-                    JSON.stringify({
-
-                        action:
-                            "submit_ujian",
-
-                        username:
-                            dataSiswa.username,
-
-                        id_login:
-                            dataSiswa.id_login || "",
-
-                        session_id:
-                            dataSiswa.session_id ||
-                            dataSiswa.sessionId ||
-                            dataSiswa.id_session ||
-                            "",
-
-                        skor:
-                            skorAkhir,
-
-                        detail_tp: {
-
-                            tp1:
-                                persenTP1,
-
-                            tp2:
-                                persenTP2
-
-                        },
-
-                        list_jawaban:
-                            jawabanFormatGAS
-
-                    })
-
-                }
-            );
-
-
-        const result =
-            await response.json();
-
-
-        if (
-            result.status === false
-        ) {
-
-            throw new Error(
-                result.message ||
-                "Server menolak penyimpanan."
-            );
-
-        }
-
-
-        btnNext.disabled = false;
-
-        pindahKe(
-            "sec-nilai"
-        );
-
-    }
-    catch (e) {
-
-        btnNext.disabled = false;
-
-        tampilkanSoal();
-
-
-        showModal({
-
-            type: "error",
-
-            title:
-                "Gagal Kirim",
-
-            text:
-                "Gagal mengirim lembar jawaban ke server. Silakan coba kembali."
-
-        });
-
-    }
-
-}
-
-
-/* =========================================================
-   PINDAH SECTION
-========================================================= */
-
-function pindahKe(idSection) {
-
-    document
-        .querySelectorAll(
-            ".wizard-section"
-        )
-        .forEach(
-            sec =>
-            sec.classList.remove(
-                "active"
-            )
-        );
-
-
-    document
-        .getElementById(
-            idSection
-        )
-        .classList.add(
-            "active"
-        );
-
-
-    if (
-        idSection === "sec-soal" ||
-        idSection === "sec-nilai"
-    ) {
-
-        document
-            .getElementById(
-                "mainContainer"
-            )
-            .classList.remove(
-                "max-normal"
-            );
-
-    }
-    else {
-
-        document
-            .getElementById(
-                "mainContainer"
-            )
-            .classList.add(
-                "max-normal"
-            );
-
-    }
-
-}
-
-
-/* =========================================================
-   RATING
-========================================================= */
-
-function setStar(rating) {
-
-    selectedRating =
-        rating;
-
-
-    document
-        .querySelectorAll(
-            ".star-rating i"
-        )
-        .forEach(
-            star => {
-
-                const val =
-                    parseInt(
-                        star.getAttribute(
-                            "data-rating"
-                        )
-                    );
-
-
-                star.classList.toggle(
-                    "active",
-                    val <= rating
-                );
-
-            }
-        );
-
-}
-
-
-function setRadio(element) {
-
-    const parent =
-        element.parentElement;
-
-
-    parent
-        .querySelectorAll(
-            ".radio-btn"
-        )
-        .forEach(
-            btn =>
-            btn.classList.remove(
-                "selected"
-            )
-        );
-
-
-    element.classList.add(
-        "selected"
-    );
-
-
-    const input =
-        element.querySelector(
-            "input"
-        );
-
-
-    if (input) {
-
-        input.checked = true;
-
-    }
-
-}
-
-
-/* =========================================================
-   KIRIM KUESIONER
-========================================================= */
-
-async function kirimKuesioner() {
-
-    const mudahSoalEl =
-        document.querySelector(
-            'input[name="mudah_soal"]:checked'
-        );
-
-
-    const saranText =
-        document
-            .getElementById(
-                "saranText"
-            )
-            .value
-            .trim();
-
-
-    if (
-        selectedRating === 0 ||
-        !mudahSoalEl
-    ) {
-
-        showModal({
-
-            type: "warning",
-
-            title:
-                "Data Belum Lengkap",
-
-            text:
-                "Mohon berikan rating bintang dan pilih tingkat kemudahan soal terlebih dahulu."
-
-        });
-
-        return;
-
-    }
-
-
-    const btn =
-        document.getElementById(
-            "btnKuesioner"
-        );
-
-
-    const spin =
-        document.getElementById(
-            "spinKuesioner"
-        );
-
-
-    const txt =
-        document.getElementById(
-            "txtKuesioner"
-        );
-
-
-    btn.disabled = true;
-
-    spin.style.display =
-        "block";
-
-    txt.innerText =
-        "MENGIRIM...";
-
-
-    try {
-
-        const response =
-            await fetch(
-                SCRIPT_URL,
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                        "text/plain;charset=utf-8"
-                    },
-
-                    body:
-                    JSON.stringify({
-
-                        action:
-                            "submit_kuesioner",
-
-                        username:
-                            dataSiswa.username,
-
-                        rating:
-                            selectedRating,
-
-                        kemudahan:
-                            mudahSoalEl.value,
-
-                        saran:
-                            saranText
-
-                    })
-
-                }
-            );
-
-
-        const result =
-            await response.json();
-
-
-        if (
-            result.status === false
-        ) {
-
-            throw new Error(
-                result.message ||
-                "Gagal menyimpan evaluasi."
-            );
-
-        }
-
-
-        pindahKe(
-            "sec-thanks"
-        );
-
-    }
-    catch(e) {
-
-        showModal({
-
-            type:
-                "error",
-
-            title:
-                "Gagal Mengirim",
-
-            text:
-                "Terjadi kesalahan koneksi saat mencoba menyimpan data evaluasi."
-
-        });
-
-    }
-    finally {
-
-        btn.disabled = false;
-
-        spin.style.display =
-            "none";
-
-        txt.innerText =
-            "KIRIM EVALUASI";
-
-    }
-
-}
-
-
-/* =========================================================
-   LOGOUT
-========================================================= */
-
-/*
-    Fungsi ini sangat penting.
-
-    Sebelumnya:
-    localStorage.clear();
-    window.location.href = "index.html";
-
-    Akibatnya halaman langsung berpindah tanpa pernah
-    mengirim action logout ke GAS.
-
-    Sekarang:
-    1. Konfirmasi
-    2. Kirim action logout
-    3. GAS mengubah Status Session menjadi OFF
-    4. Hapus localStorage
-    5. Redirect index.html
-*/
-
-
-async function logoutKeServer() {
-
-    const payload = {
-
-        action:
-            "logout",
-
-        username:
-            dataSiswa.username || "",
-
-        id_login:
-            dataSiswa.id_login || "",
-
-        session_id:
-            dataSiswa.session_id ||
-            dataSiswa.sessionId ||
-            dataSiswa.id_session ||
-            "",
-
-        nama:
-            dataSiswa.nama || "",
-
-        kelas:
-            dataSiswa.kelas || ""
-
-    };
-
-
-    try {
-
-        const response =
-            await fetch(
-                SCRIPT_URL,
-                {
-
-                    method:
-                        "POST",
-
-                    headers: {
-                        "Content-Type":
-                        "text/plain;charset=utf-8"
-                    },
-
-                    body:
-                        JSON.stringify(
-                            payload
-                        ),
-
-                    keepalive:
-                        true
-
-                }
-            );
-
-
-        const result =
-            await response.json();
-
-
-        console.log(
-            "Logout server:",
-            result
-        );
-
-
-        return result;
-
-    }
-    catch (error) {
-
-        console.error(
-            "Logout gagal:",
-            error
-        );
-
-
-        return {
-            status: false,
-            message:
-                error.message
-        };
-
-    }
-
-}
-
-
-async function logoutFinal(buttonElement = null) {
-
-    if (sedangLogout) {
-        return;
-    }
-
-
-    showModal({
-
-        type:
-            "warning",
-
-        title:
-            "Keluar Sistem?",
-
-        text:
-            "Apakah Anda yakin ingin menutup sesi dashboard dan keluar dari aplikasi?",
-
-        confirmText:
-            "Ya, Keluar",
-
-        cancelText:
-            "Batal",
-
-
-        onConfirm:
-            async () => {
-
-                if (
-                    sedangLogout
-                ) {
-                    return;
-                }
-
-
-                sedangLogout = true;
-
-
-                if (
-                    buttonElement
-                ) {
-
-                    buttonElement.disabled =
-                        true;
-
-                    buttonElement.innerHTML =
-                    `
-                    <i class="fa-solid fa-spinner fa-spin"></i>
-                    Keluar...
-                    `;
-
-                }
-
-
-                /* =====================================
-                   KIRIM LOGOUT KE GOOGLE APPS SCRIPT
-                ===================================== */
-
-                const hasilLogout =
-                    await logoutKeServer();
-
-
-                console.log(
-                    "Status logout:",
-                    hasilLogout
-                );
-
-
-                /*
-                    Hapus data lokal SETELAH request logout
-                    selesai dicoba.
-                */
-
-                localStorage.removeItem(
-                    "sesi_siswa"
-                );
-
-
-                /*
-                    Jika ada data session lain,
-                    ikut dibersihkan.
-                */
-
-                localStorage.removeItem(
-                    "session_id"
-                );
-
-                localStorage.removeItem(
-                    "id_login"
-                );
-
-
-                /*
-                    Redirect kembali ke login.
-                */
-
-                window.location.replace(
-                    "index.html"
-                );
-
-            }
-
+        if(data.user?.kelas&&data.user.kelas!==kelas){setMessage("loginMessage","Kelas yang dipilih tidak sesuai dengan akun siswa.");return;}
+        state.sessionId=data.sessionId;state.user=data.user;state.jadwal=normalizeJadwal(data.jadwal);saveState();showExamScreen();
+      }catch(err){
+        setMessage("loginMessage",normalizeScheduleError(err.message||"Gagal menghubungi server."));
+      }
+      finally{setButtonLoading(button,false,"Masuk");}
     });
 
-}
+    $("startExamButton").addEventListener("click",async()=>{
+      const button=$("startExamButton");setButtonLoading(button,true,"Menyiapkan ujian...");
+      try{
+        const data=await api("startExam",{sessionId:state.sessionId,ip:"",device:getDevice()});
+        if(!data.success){alert(data.message||"Ujian belum dapat dimulai.");return;}
+        state.googleFormUrl=data.googleFormUrl||state.googleFormUrl||CONFIG.DEFAULT_GOOGLE_FORM_URL;
+        state.examActive=true;
+        saveState();showRunningScreen();openGoogleForm();
+      }catch(err){alert(err.message||"Gagal memulai ujian.");}
+      finally{setButtonLoading(button,false,"Mulai Ujian");}
+    });
 
+    $("openFormButton").addEventListener("click",openGoogleForm);
+    $("closeEmbeddedFormButton").addEventListener("click",closeGoogleForm);
+    $("submitFormButton").addEventListener("click",e=>recordFormSubmission(e.currentTarget));
+    $("embeddedSubmitButton").addEventListener("click",e=>recordFormSubmission(e.currentTarget));
+    document.querySelectorAll("[data-open-about]").forEach(button=>button.addEventListener("click",()=>$("aboutDialog").showModal()));
+    $("closeAboutButton").addEventListener("click",()=>$("aboutDialog").close());
 
-/* =========================================================
-   OPTIONAL:
-   Jika halaman ditutup langsung, coba informasikan
-   server menggunakan sendBeacon.
+    $("questionnaireForm").addEventListener("submit",async e=>{
+      e.preventDefault();
+      const ratingAplikasi=document.querySelector('input[name="ratingAplikasi"]:checked')?.value||"";
+      const ratingSoal=document.querySelector('input[name="ratingSoal"]:checked')?.value||"";
+      const saran=$("saran").value.trim();
+      if(!ratingAplikasi||!ratingSoal){setMessage("questionMessage","Kedua rating wajib diisi.");return;}
+      const button=$("questionnaireButton");setButtonLoading(button,true,"Menyimpan...");
+      try{
+        const data=await api("questionnaire",{sessionId:state.sessionId,ratingAplikasi,ratingSoal,saran});
+        if(!data.success){setMessage("questionMessage",data.message||"Kuesioner gagal disimpan.");return;}
+        $("finishName").textContent=formatValue(state.user?.nama);$("finishClass").textContent=formatValue(state.user?.kelas);$("finishMapel").textContent=formatValue(state.jadwal?.mapel);showScreen("finishScreen");
+      }catch(err){setMessage("questionMessage",err.message||"Gagal menyimpan kuesioner.");}
+      finally{setButtonLoading(button,false,"Kirim Kuesioner");}
+    });
 
-   Ini sebagai backup tambahan, tetapi tombol logout
-   tetap menggunakan fetch utama di atas.
-========================================================= */
-
-window.addEventListener(
-    "pagehide",
-    function() {
-
-        /*
-         Jangan menjalankan logout otomatis jika halaman
-         sedang dipakai normal.
-
-         Hanya backup ketika proses logout sedang berlangsung.
-        */
-
-        if (
-            !sedangLogout
-        ) {
-            return;
-        }
-
-
-        try {
-
-            const payload =
-                JSON.stringify({
-
-                    action:
-                        "logout",
-
-                    username:
-                        dataSiswa.username || "",
-
-                    id_login:
-                        dataSiswa.id_login || "",
-
-                    session_id:
-                        dataSiswa.session_id ||
-                        dataSiswa.sessionId ||
-                        ""
-
-                });
-
-
-            navigator.sendBeacon(
-                SCRIPT_URL,
-                new Blob(
-                    [payload],
-                    {
-                        type:
-                        "text/plain;charset=utf-8"
-                    }
-                )
-            );
-
-        }
-        catch (error) {
-
-            console.log(
-                "Beacon logout gagal:",
-                error
-            );
-
-        }
-
+    async function logoutSession(){
+      try{if(state.sessionId)await api("logout",{sessionId:state.sessionId,ip:"",device:getDevice()});}
+      catch(e){}
+      finally{resetState();location.reload();}
     }
-);
+    async function clearApplicationCaches(){
+      // Browser tidak mengizinkan situs menghapus HTTP cache global; hapus cache aplikasi pada origin ini.
+      try{
+        if("caches" in window){
+          const names=await caches.keys();
+          await Promise.allSettled(names.map(name=>caches.delete(name)));
+        }
+        sessionStorage.removeItem("cbt_session_id");
+        sessionStorage.removeItem("cbt_state");
+      }catch(e){/* localStorage CBT tetap dibersihkan oleh resetState */}
+    }
+    async function resetStudentSession(){
+      if(!confirm("Reset sesi dan kembali ke halaman login? Sesi siswa juga akan ditandai selesai pada server."))return;
+      const button=$("resetButton");
+      setButtonLoading(button,true,"Menyelesaikan sesi...");
+      try{
+        if(state.sessionId){
+          const result=await api("logout",{
+            sessionId:state.sessionId,
+            ip:"",
+            device:getDevice(),
+            status:"selesai"
+          });
+          if(!result||result.success!==true)throw new Error(result?.message||"Server belum mengonfirmasi penyelesaian sesi.");
+        }
+        resetState();
+        await clearApplicationCaches();
+        location.reload();
+      }catch(err){
+        alert("Reset dibatalkan agar status server dan browser tidak berbeda. Gagal menyelesaikan sesi: "+(err.message||"kesalahan jaringan"));
+      }finally{
+        if(document.contains(button))setButtonLoading(button,false,"Reset Login / Sesi");
+      }
+    }
+    $("logoutBeforeExam").addEventListener("click",logoutSession);
+    $("logoutRunningButton").addEventListener("click",logoutSession);
+    $("backLoginButton").addEventListener("click",logoutSession);
+    $("resetButton").addEventListener("click",resetStudentSession);
+    $("finishButton").addEventListener("click",()=>{resetState();location.reload();});
+    $("scheduleButton").addEventListener("click",showScheduleDialog);
+    $("closeScheduleButton").addEventListener("click",()=>$("scheduleDialog").close());
+    $("scheduleDialog").addEventListener("click",e=>{if(e.target===e.currentTarget)e.currentTarget.close();});
 
-</script>
+    document.addEventListener("contextmenu",e=>{
+      // Proteksi hanya aktif pada Lembar Soal; off di Verifikasi Sesi dan kuesioner.
+      if(!isExamSheetOpen())return;
+      e.preventDefault();
+      if(!$("violationOverlay").classList.contains("active"))recordExamViolation("Klik kanan saat Lembar Soal terbuka");
+    });
+    document.addEventListener("keydown",e=>{
+      if(!isExamSheetOpen())return;
+      const key=String(e.key||"").toLowerCase();
+      // Jika browser meneruskan shortcut ke halaman, blokir dan kunci dengan peringatan.
+      if((e.ctrlKey||e.metaKey)&&["t","n"].includes(key)){
+        e.preventDefault();
+        recordExamViolation("Percobaan membuka tab/jendela baru");
+      }else if((e.ctrlKey||e.metaKey)&&key==="w"){
+        e.preventDefault();
+        recordExamViolation("Percobaan menutup tab Lembar Soal");
+      }
+    },true);
+    document.addEventListener("auxclick",e=>{
+      if(isExamSheetOpen()&&e.button===1)e.preventDefault();
+    },true);
 
-<script src="zoom-fitur.js"></script>
+    document.addEventListener("visibilitychange",()=>{
+      if(document.hidden&&isExamSheetOpen())recordExamViolation("Beralih tab atau meninggalkan Lembar Soal");
+      else{
+        if($("violationOverlay").classList.contains("active"))startWarningSound();
+        if(state.examActive)updateExamTimer();
+      }
+    });
+    // Fallback untuk browser yang tidak mengirim visibilitychange saat fokus berpindah.
+    // Tunggu sejenak agar fokus ke kontrol di iframe Google Form tidak salah dianggap tab baru.
+    window.addEventListener("blur",()=>{
+      window.setTimeout(()=>{
+        if(isExamSheetOpen()&&!document.hasFocus())recordExamViolation("Fokus berpindah dari Lembar Soal");
+      },120);
+    });
+    window.addEventListener("focus",()=>{
+      if($("violationOverlay").classList.contains("active"))startWarningSound();
+    });
+    window.addEventListener("storage",e=>{
+      if(e.key!==CONFIG.VIOLATION_STORAGE_KEY)return;
+      if(e.newValue){try{const record=JSON.parse(e.newValue);if(record&&record.locked&&isExamSheetOpen())showViolationLock(record);}catch(err){}}
+      else{
+        stopViolationCountdown();
+        $("violationOverlay").classList.remove("active");
+        stopWarningSound();
+      }
+    });
 
+    loadClasses();
+    restoreViolationLock();
+    restoreState();
+  </script>
 </body>
 </html>
