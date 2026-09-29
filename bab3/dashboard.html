@@ -651,12 +651,13 @@
         .anti-tab-icon { margin-bottom: 12px; color: #dc2626; font-size: 48px; }
         .anti-tab-title { margin-bottom: 10px; color: #991b1b; font-size: 21px; font-weight: 800; }
         .anti-tab-message { margin-bottom: 18px; color: #475569; font-size: 14px; line-height: 1.55; }
-        .anti-tab-countdown {
-            display: inline-block; margin: 0 auto 16px; padding: 8px 12px;
-            border: 1px solid #bfdbfe; border-radius: 999px; background: #eff6ff;
-            color: #1e40af; font-size: 12px; font-weight: 700;
+        .anti-tab-popup-timer {
+            display: block; margin: 0 auto 18px; padding: 10px 12px;
+            border: 1px solid #bfdbfe; border-radius: 10px; background: #eff6ff;
+            color: #1e40af; font-size: 13px; font-weight: 700; line-height: 1.5;
         }
-        .anti-tab-countdown[hidden] { display: none; }
+        .anti-tab-popup-timer strong { display: block; margin-top: 3px; font-size: 23px; letter-spacing: .08em; }
+        [hidden] { display: none !important; }
         .anti-tab-pin {
             width: 100%; margin-bottom: 10px; padding: 13px 14px; border: 1px solid #cbd5e1;
             border-radius: 10px; background: #f8fafc; font-size: 18px; letter-spacing: .22em; text-align: center;
@@ -687,9 +688,12 @@
 <!-- Lapisan pengunci: hanya PIN admin yang dapat menutupnya -->
 <div id="antiTabOverlay" class="anti-tab-overlay" role="dialog" aria-modal="true" aria-labelledby="antiTabTitle" aria-hidden="true">
     <div class="anti-tab-dialog">
-        <div class="anti-tab-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
-        <h2 id="antiTabTitle" class="anti-tab-title">Peringatan: Dilarang Membuka Tab</h2>
-        <p class="anti-tab-message">Perpindahan atau pembukaan tab lain terdeteksi. Halaman ujian dikunci. Masukkan PIN admin untuk kembali mengerjakan soal.</p>
+        <div id="antiTabWarningContent">
+            <div class="anti-tab-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <h2 id="antiTabTitle" class="anti-tab-title">Peringatan: Dilarang Membuka Tab</h2>
+            <p class="anti-tab-message">Perpindahan atau pembukaan tab lain terdeteksi. Halaman ujian dikunci. Masukkan PIN admin untuk kembali mengerjakan soal.</p>
+            <p class="anti-tab-popup-timer">Halaman ujian akan terbuka otomatis dalam:<strong id="antiTabPopupTimer">05:00</strong></p>
+        </div>
         <form id="antiTabPinForm" autocomplete="off">
             <input id="antiTabPin" class="anti-tab-pin" type="password" inputmode="numeric" maxlength="20" placeholder="PIN admin" aria-label="PIN admin" required>
             <p id="antiTabError" class="anti-tab-error" aria-live="polite"></p>
@@ -778,10 +782,6 @@
             <p class="section-desc"
                id="info-progres">
                 Soal n dari n
-            </p>
-
-            <p id="antiTabAutoCountdown" class="anti-tab-countdown" hidden>
-                Peringatan otomatis akan muncul dalam 05:00.
             </p>
 
             <div class="cbt-layout">
@@ -1120,11 +1120,8 @@ let sedangLogout = false;
 
 /* =========================================================
    PERLINDUNGAN PINDAH TAB / PIN ADMIN
-   Pengamanan ini berjalan di browser. PIN yang ditanam di HTML dapat
-   dilihat melalui source/DevTools; untuk keamanan kuat, validasi PIN
-   harus dilakukan di server.
 ========================================================= */
-const ADMIN_PIN_ANTI_TAB = "1212"; // PIN admin default; ubah di sini bila diperlukan.
+const ADMIN_PIN_ANTI_TAB = "1212";
 const ANTI_TAB_LOCK_KEY = (() => {
     let identifier = "default";
     try {
@@ -1133,18 +1130,18 @@ const ANTI_TAB_LOCK_KEY = (() => {
     } catch (error) {}
     return "simpatik_tab_lock_" + String(identifier).toLowerCase().slice(0, 100);
 })();
+const ANTI_TAB_PENALTY_DEADLINE_KEY = ANTI_TAB_LOCK_KEY + "_penalty_deadline";
+const ANTI_TAB_PENALTY_MS = 5 * 60 * 1000;
 let antiTabLocked = false;
+let antiTabPenaltyTimer = null;
+
 const antiTabOverlay = document.getElementById("antiTabOverlay");
 const antiTabPinInput = document.getElementById("antiTabPin");
 const antiTabError = document.getElementById("antiTabError");
 const antiTabAudio = document.getElementById("antiTabWarningAudio");
 const antiTabMessage = document.querySelector(".anti-tab-message");
-const antiTabCountdown = document.getElementById("antiTabAutoCountdown");
-const ANTI_TAB_AUTO_SHOWN_KEY = ANTI_TAB_LOCK_KEY + "_auto_shown";
-const ANTI_TAB_AUTO_DEADLINE_KEY = ANTI_TAB_LOCK_KEY + "_auto_deadline";
-const ANTI_TAB_AUTO_DELAY_MS = 5 * 60 * 1000;
-let antiTabCountdownTimer = null;
-let antiTabCountdownDeadline = 0;
+const antiTabWarningContent = document.getElementById("antiTabWarningContent");
+const antiTabPopupTimerText = document.getElementById("antiTabPopupTimer");
 
 function halamanSoalAktif() {
     return document.getElementById("sec-soal")?.classList.contains("active") === true;
@@ -1154,32 +1151,86 @@ function simpanStatusKunciTab(terkunci) {
     try {
         if (terkunci) localStorage.setItem(ANTI_TAB_LOCK_KEY, "1");
         else localStorage.removeItem(ANTI_TAB_LOCK_KEY);
-    } catch (error) { console.warn("Status kunci tab tidak dapat disimpan:", error); }
+    } catch (error) {
+        console.warn("Status kunci tab tidak dapat disimpan:", error);
+    }
 }
+
 function putarAudioPeringatan() {
     if (!antiTabLocked || !antiTabAudio) return;
     antiTabAudio.loop = true;
     const playPromise = antiTabAudio.play();
     if (playPromise && typeof playPromise.catch === "function") playPromise.catch(() => {});
 }
+
+function bukaKunciOtomatisSetelahPenalti() {
+    if (antiTabPenaltyTimer !== null) {
+        window.clearInterval(antiTabPenaltyTimer);
+        antiTabPenaltyTimer = null;
+    }
+    antiTabLocked = false;
+    simpanStatusKunciTab(false);
+    antiTabOverlay.classList.remove("active");
+    antiTabOverlay.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("anti-tab-locked");
+    antiTabAudio.pause();
+    antiTabAudio.currentTime = 0;
+    antiTabPinInput.value = "";
+    antiTabError.textContent = "";
+    try { localStorage.removeItem(ANTI_TAB_PENALTY_DEADLINE_KEY); } catch (error) {}
+}
+
+function mulaiCountdownPenalti(pulihkan = false) {
+    if (antiTabPenaltyTimer !== null) {
+        window.clearInterval(antiTabPenaltyTimer);
+        antiTabPenaltyTimer = null;
+    }
+
+    let deadline = 0;
+    try {
+        const tersimpan = Number(localStorage.getItem(ANTI_TAB_PENALTY_DEADLINE_KEY));
+        deadline = pulihkan && tersimpan > 0 ? tersimpan : Date.now() + ANTI_TAB_PENALTY_MS;
+        localStorage.setItem(ANTI_TAB_PENALTY_DEADLINE_KEY, String(deadline));
+    } catch (error) {
+        deadline = Date.now() + ANTI_TAB_PENALTY_MS;
+    }
+
+    const perbarui = () => {
+        const sisaMs = Math.max(0, deadline - Date.now());
+        const totalDetik = Math.ceil(sisaMs / 1000);
+        const menit = String(Math.floor(totalDetik / 60)).padStart(2, "0");
+        const detik = String(totalDetik % 60).padStart(2, "0");
+        antiTabPopupTimerText.textContent = `${menit}:${detik}`;
+        if (sisaMs <= 0) bukaKunciOtomatisSetelahPenalti();
+    };
+
+    perbarui();
+    if (antiTabLocked && Date.now() < deadline) {
+        antiTabPenaltyTimer = window.setInterval(perbarui, 1000);
+    }
+}
+
 function kunciKarenaPindahTab(alasan = "pindah-tab", pulihkanKunci = false) {
-    // Popup pelanggaran hanya dipicu saat halaman Lembar Soal sedang aktif.
-    // PulihkanKunci menjaga lock yang sudah tersimpan tetap berlaku sesudah reload.
     if (!pulihkanKunci && !halamanSoalAktif()) return;
+    const sudahTerkunci = antiTabLocked;
     antiTabLocked = true;
     simpanStatusKunciTab(true);
     document.body.classList.add("anti-tab-locked");
     antiTabOverlay.classList.add("active");
     antiTabOverlay.setAttribute("aria-hidden", "false");
-    antiTabMessage.textContent = alasan === "otomatis"
-        ? "Waktu 5 menit telah habis. Peringatan otomatis ditampilkan dan halaman ujian dikunci. Masukkan PIN admin untuk melanjutkan."
-        : alasan === "pulihkan"
-            ? "Halaman ujian masih terkunci dari pelanggaran sebelumnya. Masukkan PIN admin untuk melanjutkan."
-            : "Perpindahan atau pembukaan tab lain terdeteksi. Halaman ujian dikunci. Masukkan PIN admin untuk kembali mengerjakan soal.";
+    antiTabWarningContent.hidden = false;
+    antiTabMessage.textContent = alasan === "pulihkan"
+        ? "Pelanggaran tab sebelumnya masih terkunci. Penalti lima menit tetap berjalan; PIN admin dapat membuka lebih awal."
+        : "Tab lain terdeteksi. Sebagai penalti waktu, halaman ujian terkunci selama lima menit. Halaman terbuka otomatis saat hitung mundur habis; PIN admin dapat membuka lebih awal.";
     antiTabError.textContent = "";
     putarAudioPeringatan();
+
+    if (!sudahTerkunci || pulihkanKunci) {
+        mulaiCountdownPenalti(pulihkanKunci);
+    }
     window.setTimeout(() => { if (antiTabLocked) antiTabPinInput.focus(); }, 100);
 }
+
 function bukaKunciDenganPin(pin) {
     if (String(pin).trim() !== ADMIN_PIN_ANTI_TAB) {
         antiTabError.textContent = "PIN admin salah. Halaman ujian masih terkunci.";
@@ -1188,6 +1239,8 @@ function bukaKunciDenganPin(pin) {
         putarAudioPeringatan();
         return false;
     }
+    if (antiTabPenaltyTimer !== null) window.clearInterval(antiTabPenaltyTimer);
+    antiTabPenaltyTimer = null;
     antiTabLocked = false;
     simpanStatusKunciTab(false);
     antiTabOverlay.classList.remove("active");
@@ -1197,69 +1250,16 @@ function bukaKunciDenganPin(pin) {
     antiTabError.textContent = "";
     antiTabAudio.pause();
     antiTabAudio.currentTime = 0;
+    try { localStorage.removeItem(ANTI_TAB_PENALTY_DEADLINE_KEY); } catch (error) {}
     return true;
 }
 
-function hentikanCountdownPeringatan(hapusDeadline = false) {
-    if (antiTabCountdownTimer !== null) {
-        window.clearInterval(antiTabCountdownTimer);
-        antiTabCountdownTimer = null;
-    }
-    if (hapusDeadline) {
-        antiTabCountdownDeadline = 0;
-        try { localStorage.removeItem(ANTI_TAB_AUTO_DEADLINE_KEY); } catch (error) {}
-    }
-    if (antiTabCountdown) antiTabCountdown.hidden = true;
-}
-
-function mulaiCountdownPeringatan() {
-    hentikanCountdownPeringatan(false);
-    if (!halamanSoalAktif()) return;
-
-    try {
-        if (localStorage.getItem(ANTI_TAB_AUTO_SHOWN_KEY) === "1") {
-            antiTabCountdown.hidden = false;
-            antiTabCountdown.textContent = "Peringatan otomatis 5 menit sudah ditampilkan.";
-            return;
-        }
-        const deadlineTersimpan = Number(localStorage.getItem(ANTI_TAB_AUTO_DEADLINE_KEY));
-        antiTabCountdownDeadline = deadlineTersimpan > Date.now()
-            ? deadlineTersimpan
-            : Date.now() + ANTI_TAB_AUTO_DELAY_MS;
-        localStorage.setItem(ANTI_TAB_AUTO_DEADLINE_KEY, String(antiTabCountdownDeadline));
-    } catch (error) {
-        antiTabCountdownDeadline = Date.now() + ANTI_TAB_AUTO_DELAY_MS;
-    }
-
-    antiTabCountdown.hidden = false;
-    const perbaruiCountdown = () => {
-        if (!halamanSoalAktif()) {
-            hentikanCountdownPeringatan(true);
-            return;
-        }
-        const sisaMs = Math.max(0, antiTabCountdownDeadline - Date.now());
-        const sisaDetik = Math.ceil(sisaMs / 1000);
-        const menit = String(Math.floor(sisaDetik / 60)).padStart(2, "0");
-        const detik = String(sisaDetik % 60).padStart(2, "0");
-        antiTabCountdown.textContent = sisaMs > 0
-            ? `Peringatan otomatis akan muncul dalam ${menit}:${detik}.`
-            : "Peringatan otomatis sedang ditampilkan.";
-
-        if (sisaMs <= 0) {
-            hentikanCountdownPeringatan(true);
-            try { localStorage.setItem(ANTI_TAB_AUTO_SHOWN_KEY, "1"); } catch (error) {}
-            antiTabCountdown.hidden = false;
-            antiTabCountdown.textContent = "Peringatan otomatis 5 menit sudah ditampilkan.";
-            kunciKarenaPindahTab("otomatis");
-        }
-    };
-    perbaruiCountdown();
-    antiTabCountdownTimer = window.setInterval(perbaruiCountdown, 1000);
-}
-
+// Memulihkan hukuman jika halaman direload sebelum lima menit berlalu.
 try {
     if (localStorage.getItem(ANTI_TAB_LOCK_KEY) === "1") kunciKarenaPindahTab("pulihkan", true);
-} catch (error) { console.warn("Status kunci tab tidak dapat dibaca:", error); }
+} catch (error) {
+    console.warn("Status kunci tab tidak dapat dibaca:", error);
+}
 
 document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "hidden" && halamanSoalAktif()) kunciKarenaPindahTab();
@@ -1275,30 +1275,38 @@ function cegahBukaTabDariTautan(event) {
     const targetBaru = (anchor.getAttribute("target") || "").toLowerCase() === "_blank";
     const klikModifikasi = event.ctrlKey || event.metaKey || event.shiftKey || event.button === 1;
     if (targetBaru || klikModifikasi) {
-        event.preventDefault(); event.stopImmediatePropagation(); kunciKarenaPindahTab();
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        kunciKarenaPindahTab();
     }
 }
 document.addEventListener("click", cegahBukaTabDariTautan, true);
-document.addEventListener("auxclick", event => { if (event.button === 1) cegahBukaTabDariTautan(event); }, true);
+document.addEventListener("auxclick", event => {
+    if (event.button === 1) cegahBukaTabDariTautan(event);
+}, true);
 document.addEventListener("keydown", event => {
     const key = String(event.key || "").toLowerCase();
     const modifier = event.ctrlKey || event.metaKey;
     const newTabOrWindow = modifier && (key === "t" || key === "n" || (event.shiftKey && key === "n"));
     if (newTabOrWindow) {
-        event.preventDefault(); event.stopImmediatePropagation(); kunciKarenaPindahTab();
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        kunciKarenaPindahTab();
     }
     if (antiTabLocked) putarAudioPeringatan();
 }, true);
 try {
     window.open = function () { kunciKarenaPindahTab(); return null; };
-} catch (error) { console.warn("Pemblokiran window.open tidak didukung:", error); }
+} catch (error) {
+    console.warn("Pemblokiran window.open tidak didukung:", error);
+}
 ["pointerdown", "touchstart"].forEach(eventName => {
     document.addEventListener(eventName, () => { if (antiTabLocked) putarAudioPeringatan(); }, { passive: true });
 });
 document.getElementById("antiTabPinForm").addEventListener("submit", event => {
-    event.preventDefault(); bukaKunciDenganPin(antiTabPinInput.value);
+    event.preventDefault();
+    bukaKunciDenganPin(antiTabPinInput.value);
 });
-
 
 
 /* =========================================================
@@ -1826,12 +1834,6 @@ function mintaLayarPenuh() {
 function mulaiUjian() {
 
     mintaLayarPenuh();
-
-    // Setiap sesi soal baru memperoleh satu peringatan otomatis setelah 5 menit.
-    try {
-        localStorage.removeItem(ANTI_TAB_AUTO_SHOWN_KEY);
-        localStorage.removeItem(ANTI_TAB_AUTO_DEADLINE_KEY);
-    } catch (error) {}
 
     indeksSekarang = 0;
 
@@ -2850,12 +2852,6 @@ function pindahKe(idSection) {
         .classList.add(
             "active"
         );
-
-    if (idSection === "sec-soal") {
-        mulaiCountdownPeringatan();
-    } else {
-        hentikanCountdownPeringatan(true);
-    }
 
 
     if (
