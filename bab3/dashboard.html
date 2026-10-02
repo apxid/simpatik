@@ -1254,22 +1254,31 @@ function bukaKunciDenganPin(pin) {
     return true;
 }
 
-// Memulihkan hukuman jika halaman direload sebelum lima menit berlalu.
-try {
-    if (localStorage.getItem(ANTI_TAB_LOCK_KEY) === "1") kunciKarenaPindahTab("pulihkan", true);
-} catch (error) {
-    console.warn("Status kunci tab tidak dapat dibaca:", error);
+// Pulihkan penalti hanya setelah layar soal benar-benar aktif.
+// Layar konfirmasi/unduh soal dan layar hasil tetap dapat digunakan normal.
+function pulihkanKunciTabJikaPerlu() {
+    if (!halamanSoalAktif()) return;
+    try {
+        if (localStorage.getItem(ANTI_TAB_LOCK_KEY) === "1") {
+            kunciKarenaPindahTab("pulihkan", true);
+        }
+    } catch (error) {
+        console.warn("Status kunci tab tidak dapat dibaca:", error);
+    }
 }
 
 document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "hidden" && halamanSoalAktif()) kunciKarenaPindahTab();
-    else if (antiTabLocked) {
+    else if (antiTabLocked && halamanSoalAktif()) {
         putarAudioPeringatan();
         window.setTimeout(() => antiTabPinInput.focus(), 50);
     }
 });
-document.addEventListener("contextmenu", event => event.preventDefault(), true);
+document.addEventListener("contextmenu", event => {
+    if (halamanSoalAktif()) event.preventDefault();
+}, true);
 function cegahBukaTabDariTautan(event) {
+    if (!halamanSoalAktif()) return;
     const anchor = event.target && event.target.closest ? event.target.closest("a[href]") : null;
     if (!anchor) return;
     const targetBaru = (anchor.getAttribute("target") || "").toLowerCase() === "_blank";
@@ -1285,6 +1294,7 @@ document.addEventListener("auxclick", event => {
     if (event.button === 1) cegahBukaTabDariTautan(event);
 }, true);
 document.addEventListener("keydown", event => {
+    if (!halamanSoalAktif()) return;
     const key = String(event.key || "").toLowerCase();
     const modifier = event.ctrlKey || event.metaKey;
     const newTabOrWindow = modifier && (key === "t" || key === "n" || (event.shiftKey && key === "n"));
@@ -1295,8 +1305,16 @@ document.addEventListener("keydown", event => {
     }
     if (antiTabLocked) putarAudioPeringatan();
 }, true);
+// Pertahankan perilaku window.open normal di luar layar soal.
+const windowOpenAsli = window.open.bind(window);
 try {
-    window.open = function () { kunciKarenaPindahTab(); return null; };
+    window.open = function (...args) {
+        if (!halamanSoalAktif()) {
+            return windowOpenAsli(...args);
+        }
+        kunciKarenaPindahTab("buka-tab-baru");
+        return null;
+    };
 } catch (error) {
     console.warn("Pemblokiran window.open tidak didukung:", error);
 }
@@ -2853,6 +2871,12 @@ function pindahKe(idSection) {
             "active"
         );
 
+    if (idSection === "sec-soal") {
+        pulihkanKunciTabJikaPerlu();
+    } else if (antiTabLocked) {
+        // Proteksi dan overlay tidak boleh terbawa ke layar selain pengerjaan soal.
+        bukaKunciOtomatisSetelahPenalti();
+    }
 
     if (
         idSection === "sec-soal" ||
